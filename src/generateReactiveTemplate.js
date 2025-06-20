@@ -4,10 +4,12 @@ function createFunction(expressionNode, context) {
 
     return () => {
       const env = typeof window === "undefined" ? globalThis : window;
-      const result = env[functionName]?.();
+
       if (context && functionName in context) {
         return context[functionName]();
       }
+
+      const result = env[functionName]?.();
       if (result == undefined && !(functionName in env)) {
         console.warn(`函數 "${functionName}" 不存在`);
       }
