@@ -1,62 +1,97 @@
 export default function linearSplit(ast) {
   const sequence = [];
 
+  function processOpeningElement(openingElement) {
+    const tagName = openingElement.name.value;
+    let content = `<${tagName}`;
+
+    if (openingElement.attributes?.length > 0) {
+      for (const attr of openingElement.attributes) {
+        if (attr.type !== "JSXAttribute") continue;
+
+        const attrName = attr.name.value;
+
+        if (!attr.value) {
+          content += ` ${attrName}`;
+        } else if (attr.value.type === "StringLiteral") {
+          content += ` ${attrName}="${attr.value.value}"`;
+        } else if (attr.value.type === "JSXExpressionContainer") {
+          content += ` ${attrName}=`;
+
+          if (content) {
+            sequence.push({ type: "static", content });
+          }
+
+          sequence.push({
+            type: "dynamic",
+            expression: attr.value.expression,
+          });
+
+          content = "";
+        }
+      }
+    }
+
+    content += ">";
+    if (content) {
+      sequence.push({ type: "static", content });
+    }
+  }
+
+  function processClosingElement(tagName) {
+    sequence.push({ type: "static", content: `</${tagName}>` });
+  }
+
+  function processText(node) {
+    const text = node.value?.trim();
+    if (text) {
+      sequence.push({ type: "static", content: text });
+    }
+  }
+
+  function processExpression(expression) {
+    sequence.push({
+      type: "dynamic",
+      expression: expression,
+    });
+  }
+
   function traverse(node) {
     if (!node || typeof node !== "object") return;
 
     switch (node.type) {
       case "JSXElement":
-        const tagName = node.opening?.name?.value;
-        if (tagName) {
-          sequence.push({ type: "static", content: `<${tagName}>` });
-        }
+        processOpeningElement(node.opening);
 
-        if (node.children && Array.isArray(node.children)) {
-          node.children.forEach(traverse);
-        }
+        node.children?.forEach(traverse);
 
-        if (tagName) {
-          sequence.push({ type: "static", content: `</${tagName}>` });
-        }
+        processClosingElement(node.opening.name.value);
         break;
 
       case "JSXText":
-        if (node.value && node.value.trim()) {
-          sequence.push({
-            type: "static",
-            content: node.value.trim(),
-          });
-        }
+        processText(node);
         break;
 
       case "JSXExpressionContainer":
-        sequence.push({
-          type: "dynamic",
-          expression: node.expression,
-        });
+        processExpression(node.expression);
         break;
 
       case "ExpressionStatement":
-        if (node.expression) {
-          traverse(node.expression);
-        }
+        traverse(node.expression);
         break;
 
       case "Module":
-        if (node.body && Array.isArray(node.body)) {
-          node.body.forEach(traverse);
-        }
+        node.body?.forEach(traverse);
         break;
 
       default:
-        for (const key in node) {
-          const child = node[key];
+        Object.values(node).forEach((child) => {
           if (Array.isArray(child)) {
             child.forEach(traverse);
-          } else if (child && typeof child === "object" && child.type) {
+          } else if (child?.type) {
             traverse(child);
           }
-        }
+        });
     }
   }
 
