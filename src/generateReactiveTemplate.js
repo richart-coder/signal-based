@@ -1,3 +1,10 @@
+const booleanAttrSet = new Set([
+  "disabled",
+  "checked",
+  "selected",
+  "hidden",
+  "readonly",
+]);
 function cleanupTempAttrs(container) {
   const tempElements = container.querySelectorAll(
     '[class*="data-attr-"], [class*="data-event-"]'
@@ -70,23 +77,15 @@ function applyBinding(element, bindingInfo, binding, effect) {
 
       effect(() => {
         const value = binding();
-
-        if (
-          ["disabled", "checked", "selected", "hidden", "readonly"].includes(
-            name
-          )
-        ) {
-          if (value) {
-            targetAttrElement.setAttribute(name, "");
-          } else {
-            targetAttrElement.removeAttribute(name);
-          }
+        const isBooleanAttr = booleanAttrSet.has(name);
+        const shouldSetAttribute = isBooleanAttr
+          ? value
+          : value != null && value !== false;
+        const attrValue = isBooleanAttr ? "" : String(value);
+        if (shouldSetAttribute) {
+          targetAttrElement.setAttribute(name, attrValue);
         } else {
-          if (value != null && value !== false) {
-            targetAttrElement.setAttribute(name, String(value));
-          } else {
-            targetAttrElement.removeAttribute(name);
-          }
+          targetAttrElement.removeAttribute(name);
         }
       });
       break;
