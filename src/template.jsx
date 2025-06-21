@@ -1,11 +1,13 @@
 // prettier-ignore
-<div className={getClass()}>
-  <h1>{getTitle()}</h1>
+<div className={cssClass()}>
+  <h1>{title()}</h1>
   <div>
     <p>Count: {count()}</p>
-    <input type="text" value={getValue()} disabled={isInputDisabled()} />
+    <input type="text" onInput={handleInput} placeholder="type here..." value={inputValue()} disabled={isDisabled()} />
+    {inputValue()}
     <br />
+
     <button onClick={handleClick}>Toggle Input</button>
-    <p>Status: {isInputDisabled()}</p>
+    <p>Status: {getToggleText()}</p>
   </div>
 </div>

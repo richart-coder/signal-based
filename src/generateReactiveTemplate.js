@@ -5,21 +5,6 @@ const booleanAttrSet = new Set([
   "hidden",
   "readonly",
 ]);
-function cleanupTempAttrs(container) {
-  const tempElements = container.querySelectorAll(
-    '[class*="data-attr-"], [class*="data-event-"]'
-  );
-  tempElements.forEach((el) => {
-    [...el.attributes].forEach((attr) => {
-      if (
-        attr.name.startsWith("data-attr-") ||
-        attr.name.startsWith("data-event-")
-      ) {
-        el.removeAttribute(attr.name);
-      }
-    });
-  });
-}
 
 function detectBindingType(templateSoFar) {
   const context = templateSoFar.slice(-200);
@@ -47,95 +32,33 @@ function detectBindingType(templateSoFar) {
   return { type: "text" };
 }
 
-function applyBinding(element, bindingInfo, binding, effect) {
-  switch (bindingInfo.type) {
-    case "event":
-      const eventName = bindingInfo.name.startsWith("on")
-        ? bindingInfo.name.slice(2).toLowerCase()
-        : bindingInfo.name.toLowerCase();
-
-      const handler = binding();
-      const targetElement = element.parentElement;
-
-      if (typeof handler === "function" && targetElement) {
-        targetElement.addEventListener(eventName, (event) => {
-          handler(event);
-        });
-      } else {
-        console.error("❌ 事件綁定失敗:", typeof handler, targetElement);
-      }
-      break;
-
-    case "attr":
-      const { name } = bindingInfo;
-      const targetAttrElement = element.parentElement;
-
-      if (!targetAttrElement) {
-        console.error("❌ 找不到目標元素");
-        break;
-      }
-
-      effect(() => {
-        const value = binding();
-        const isBooleanAttr = booleanAttrSet.has(name);
-        const shouldSetAttribute = isBooleanAttr
-          ? value
-          : value != null && value !== false;
-        const attrValue = isBooleanAttr ? "" : String(value);
-        if (shouldSetAttribute) {
-          targetAttrElement.setAttribute(name, attrValue);
-        } else {
-          targetAttrElement.removeAttribute(name);
-        }
-      });
-      break;
-
-    case "text":
-    default:
-      const textNode = document.createTextNode("");
-      element.parentNode.replaceChild(textNode, element);
-
-      effect(() => {
-        const value = binding();
-        textNode.textContent = value ?? "";
-      });
-      break;
-  }
-}
-
 function createFunction(expressionNode, context) {
   if (expressionNode.type === "CallExpression") {
     const functionName = expressionNode.callee.value;
-
     return () => {
       if (context && functionName in context) {
         return context[functionName]();
       }
-
       const env = typeof window === "undefined" ? globalThis : window;
       const result = env[functionName]?.();
       if (result == undefined && !(functionName in env)) {
         console.warn(`函數 "${functionName}" 不存在`);
       }
-
       return result;
     };
   }
 
   if (expressionNode.type === "Identifier") {
     const functionName = expressionNode.value;
-
     return () => {
       if (context && functionName in context) {
         return context[functionName];
       }
-
       const env = typeof window === "undefined" ? globalThis : window;
       const result = env[functionName];
       if (result == undefined && !(functionName in env)) {
         console.warn(`函數 "${functionName}" 不存在`);
       }
-
       return result;
     };
   }
@@ -144,7 +67,6 @@ function createFunction(expressionNode, context) {
     const testFn = createFunction(expressionNode.test, context);
     const consequentFn = createFunction(expressionNode.consequent, context);
     const alternateFn = createFunction(expressionNode.alternate, context);
-
     return () => {
       const testResult = testFn();
       return testResult ? consequentFn() : alternateFn();
@@ -164,6 +86,10 @@ function createFunction(expressionNode, context) {
   if (expressionNode.type === "BooleanLiteral") {
     const value = expressionNode.value;
     return () => value;
+  }
+
+  if (expressionNode.type === "JSXEmptyExpression") {
+    return () => "";
   }
 
   if (expressionNode.type === "BinaryExpression") {
@@ -227,20 +153,19 @@ export default function generateReactiveTemplate(merged, { context, effect }) {
       template += item.content;
     } else {
       const bindingInfo = detectBindingType(template);
-      const bindingId = `${bindingInfo.type}-${bindingIndex}`;
+      const bindingId = `binding-${bindingIndex}`;
 
       if (bindingInfo.type === "attr") {
-        template = template.replace(/\s+[a-zA-Z][a-zA-Z0-9-]*\s*=\s*$/, "");
-        template += ` data-attr-${bindingIndex}="placeholder"><span data-binding="${bindingId}"></span`;
+        template += `"{{ATTR_${bindingIndex}}}"`;
       } else if (bindingInfo.type === "event") {
-        template = template.replace(/\s+on[A-Z][a-zA-Z]*\s*=\s*$/, "");
-        template += ` data-event-${bindingIndex}="placeholder"><span data-binding="${bindingId}"></span`;
+        template += `"{{EVENT_${bindingIndex}}}"`;
       } else {
-        template += `<span data-binding="${bindingId}"></span>`;
+        template += `<!--TEXT_${bindingIndex}-->`;
       }
 
       dynamicBindings.push({
         id: bindingId,
+        index: bindingIndex,
         info: bindingInfo,
         binding: createFunction(item.expression, context),
       });
@@ -250,19 +175,139 @@ export default function generateReactiveTemplate(merged, { context, effect }) {
 
   return {
     mount(container) {
-      container.innerHTML = template;
-      dynamicBindings.forEach(({ id, info, binding }) => {
-        const bindingElement = container.querySelector(
-          `[data-binding="${id}"]`
+      const elementBindings = new Map();
+
+      let processedTemplate = template;
+
+      let elementCounter = 0;
+      const elementIdMap = new Map();
+
+      dynamicBindings.forEach(({ index, info, binding }) => {
+        if (info.type === "attr") {
+          const oldPattern = `"{{ATTR_${index}}}"`;
+
+          const templateUpToHere = processedTemplate.substring(
+            0,
+            processedTemplate.indexOf(oldPattern)
+          );
+          const elementPosition = templateUpToHere.lastIndexOf("<");
+
+          let elementId;
+          if (elementIdMap.has(elementPosition)) {
+            elementId = elementIdMap.get(elementPosition);
+          } else {
+            elementId = `element-${elementCounter++}`;
+            elementIdMap.set(elementPosition, elementId);
+          }
+
+          const newPattern = `"" data-element-id="${elementId}"`;
+          processedTemplate = processedTemplate.replace(oldPattern, newPattern);
+
+          if (!elementBindings.has(elementId)) {
+            elementBindings.set(elementId, []);
+          }
+          elementBindings.get(elementId).push({ type: "attr", info, binding });
+        } else if (info.type === "event") {
+          const oldPattern = `"{{EVENT_${index}}}"`;
+
+          const templateUpToHere = processedTemplate.substring(
+            0,
+            processedTemplate.indexOf(oldPattern)
+          );
+          const elementPosition = templateUpToHere.lastIndexOf("<");
+
+          let elementId;
+          if (elementIdMap.has(elementPosition)) {
+            elementId = elementIdMap.get(elementPosition);
+          } else {
+            elementId = `element-${elementCounter++}`;
+            elementIdMap.set(elementPosition, elementId);
+          }
+
+          const newPattern = `"" data-element-id="${elementId}"`;
+          processedTemplate = processedTemplate.replace(oldPattern, newPattern);
+
+          if (!elementBindings.has(elementId)) {
+            elementBindings.set(elementId, []);
+          }
+          elementBindings.get(elementId).push({ type: "event", info, binding });
+        }
+      });
+
+      container.innerHTML = processedTemplate;
+
+      elementBindings.forEach((bindings, elementId) => {
+        const element = container.querySelector(
+          `[data-element-id="${elementId}"]`
         );
 
-        if (bindingElement && effect) {
-          applyBinding(bindingElement, info, binding, effect);
-        } else {
-          console.warn("找不到綁定元素:", id);
-        }
+        if (element) {
+          element.removeAttribute("data-element-id");
 
-        cleanupTempAttrs(container);
+          bindings.forEach(({ type, info, binding }) => {
+            if (type === "attr") {
+              const attrName = info.name;
+
+              if (effect) {
+                effect(() => {
+                  const value = binding();
+                  const isBooleanAttr = booleanAttrSet.has(attrName);
+                  const shouldSetAttribute = isBooleanAttr
+                    ? value
+                    : value != null && value !== false;
+                  const attrValue = isBooleanAttr ? "" : String(value);
+
+                  if (shouldSetAttribute) {
+                    element.setAttribute(attrName, attrValue);
+                  } else {
+                    element.removeAttribute(attrName);
+                  }
+                });
+              } else {
+                console.warn("❌ effect 函數不存在");
+              }
+            } else if (type === "event") {
+              const eventName = info.name;
+
+              const actualEventName = eventName.startsWith("on")
+                ? eventName.slice(2).toLowerCase()
+                : eventName.toLowerCase();
+
+              const handler = binding();
+              if (typeof handler === "function") {
+                element.addEventListener(actualEventName, handler);
+              } else {
+                console.warn(`❌ 事件處理器不是函數: ${typeof handler}`);
+              }
+            }
+          });
+        }
+      });
+
+      dynamicBindings.forEach(({ index, info, binding }) => {
+        if (info.type === "text") {
+          const walker = document.createTreeWalker(
+            container,
+            NodeFilter.SHOW_COMMENT,
+            null
+          );
+
+          let comment;
+          while ((comment = walker.nextNode())) {
+            if (comment.textContent === `TEXT_${index}`) {
+              const textNode = document.createTextNode("");
+              comment.parentNode?.replaceChild(textNode, comment);
+
+              if (effect) {
+                effect(() => {
+                  const value = binding();
+                  textNode.textContent = value ?? "";
+                });
+              }
+              break;
+            }
+          }
+        }
       });
     },
   };

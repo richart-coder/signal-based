@@ -10,6 +10,7 @@ export default function linearSplit(ast) {
         if (attr.type !== "JSXAttribute") continue;
 
         const attrName = attr.name.value;
+        if (!attrName) continue;
 
         if (!attr.value) {
           content += ` ${attrName}`;
@@ -18,14 +19,13 @@ export default function linearSplit(ast) {
         } else if (attr.value.type === "JSXExpressionContainer") {
           content += ` ${attrName}=`;
 
-          if (content) {
-            sequence.push({ type: "static", content });
-          }
-
-          sequence.push({
-            type: "dynamic",
-            expression: attr.value.expression,
-          });
+          sequence.push(
+            { type: "static", content },
+            {
+              type: "dynamic",
+              expression: attr.value.expression,
+            }
+          );
 
           content = "";
         }
@@ -64,8 +64,9 @@ export default function linearSplit(ast) {
         processOpeningElement(node.opening);
 
         node.children?.forEach(traverse);
-
-        processClosingElement(node.opening.name.value);
+        if (!node.opening.selfClosing && node.closing) {
+          processClosingElement(node.opening.name.value);
+        }
         break;
 
       case "JSXText":

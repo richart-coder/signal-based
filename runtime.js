@@ -5,39 +5,31 @@ let lastCompiled = 0;
 
 const count = signal(0);
 const cssClass = signal("container");
-const imageUrl = signal("https://via.placeholder.com/150");
-const imageAlt = signal("Placeholder image");
-const inputValue = signal("Type here...");
+
+const inputValue = signal("");
 const isDisabled = signal(false);
 
-const getClass = () => cssClass();
-const getTitle = () => title();
-const getImageUrl = () => imageUrl();
-const getAlt = () => imageAlt();
-const getValue = () => inputValue();
-const isInputDisabled = () => isDisabled();
 const getToggleText = () => (isDisabled() ? "Disabled" : "Enabled");
-
+const title = computed(() => `Dynamic Title ${count()}`);
 const handleClick = () => {
-  console.log("Button clicked!");
   isDisabled.set(!isDisabled());
 };
-
+const handleInput = (e) => {
+  inputValue.set(e.target.value);
+};
+const getIsDisabled = computed(() => {
+  return isDisabled();
+});
 const context = {
+  title,
   count,
   cssClass,
-  imageUrl,
-  imageAlt,
+  handleInput,
   inputValue,
   isDisabled,
-  getClass,
-  getTitle,
-  getImageUrl,
-  getAlt,
-  getValue,
-  isInputDisabled,
   handleClick,
   getToggleText,
+  getIsDisabled,
 };
 
 async function loadAndMount() {
@@ -64,7 +56,6 @@ async function loadAndMount() {
 }
 
 loadAndMount();
-const title = computed(() => `Dynamic Title ${count()}`);
 
 setInterval(() => {
   count.set(count() + 1);
