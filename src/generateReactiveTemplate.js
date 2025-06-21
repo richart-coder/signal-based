@@ -172,50 +172,47 @@ export default function generateReactiveTemplate(merged, { context, effect }) {
       bindingIndex++;
     }
   });
+  const textBindingsToProcess = [];
+  const { processedTemplate, elementBindings } = (() => {
+    const elementBindings = new Map();
+    let processedTemplate = template;
+    let elementCounter = 0;
+    const elementIdMap = new Map();
 
+    dynamicBindings.forEach(({ index, info, binding }) => {
+      switch (info.type) {
+        case "attr":
+        case "event":
+          const result = processElementBinding({
+            index,
+            info,
+            processedTemplate,
+            elementCounter,
+            elementIdMap,
+          });
+
+          processedTemplate = result.processedTemplate;
+          elementCounter = result.elementCounter;
+
+          if (!elementBindings.has(result.elementId)) {
+            elementBindings.set(result.elementId, []);
+          }
+          elementBindings.get(result.elementId).push({
+            type: info.type,
+            info,
+            binding,
+          });
+          break;
+        case "text":
+          textBindingsToProcess.push({ index, info, binding });
+          break;
+      }
+    });
+
+    return { processedTemplate, elementBindings };
+  })();
   return {
     mount(container) {
-      const textBindingsToProcess = [];
-
-      const { processedTemplate, elementBindings } = (() => {
-        const elementBindings = new Map();
-        let processedTemplate = template;
-        let elementCounter = 0;
-        const elementIdMap = new Map();
-
-        dynamicBindings.forEach(({ index, info, binding }) => {
-          switch (info.type) {
-            case "attr":
-            case "event":
-              const result = processElementBinding({
-                index,
-                info,
-                processedTemplate,
-                elementCounter,
-                elementIdMap,
-              });
-
-              processedTemplate = result.processedTemplate;
-              elementCounter = result.elementCounter;
-
-              if (!elementBindings.has(result.elementId)) {
-                elementBindings.set(result.elementId, []);
-              }
-              elementBindings.get(result.elementId).push({
-                type: info.type,
-                info,
-                binding,
-              });
-              break;
-            case "text":
-              textBindingsToProcess.push({ index, info, binding });
-              break;
-          }
-        });
-
-        return { processedTemplate, elementBindings };
-      })();
-
       container.innerHTML = processedTemplate;
 
       applyElementBindings(elementBindings, container, effect);
