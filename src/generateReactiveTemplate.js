@@ -276,6 +276,7 @@ export default function generateReactiveTemplate(merged, { context, effect }) {
               const handler = binding();
               if (typeof handler === "function") {
                 element.addEventListener(actualEventName, handler);
+                element.removeAttribute(eventName);
               } else {
                 console.warn(`❌ 事件處理器不是函數: ${typeof handler}`);
               }
