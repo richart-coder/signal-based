@@ -7,7 +7,7 @@
     {inputValue()}
     <br />
 
-    <button onClick={handleClick}>Toggle Input</button>
+    <button onClick={handleClick}>Toggle Input12</button>
     <p>Status: {getToggleText()}</p>
   </div>
 </div>

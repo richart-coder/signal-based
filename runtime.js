@@ -11,7 +11,6 @@ const isDisabled = signal(false);
 
 const getToggleText = () => (isDisabled() ? "Disabled" : "Enabled");
 const title = computed(() => `Dynamic Title ${count()}`);
-const getIsDisabled = computed(() => isDisabled());
 
 const handleClick = () => {
   isDisabled.set(!isDisabled());
@@ -29,7 +28,6 @@ const context = {
   isDisabled,
   handleClick,
   getToggleText,
-  getIsDisabled,
 };
 
 async function loadAndMount() {

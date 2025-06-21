@@ -9,15 +9,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 4927,
-        "end": 4934
+        "start": 422,
+        "end": 429
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 4927,
-          "end": 4932
+          "start": 422,
+          "end": 427
         },
         "ctxt": 1,
         "value": "title",
@@ -36,15 +36,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 4964,
-        "end": 4971
+        "start": 459,
+        "end": 466
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 4964,
-          "end": 4969
+          "start": 459,
+          "end": 464
         },
         "ctxt": 1,
         "value": "count",
@@ -63,8 +63,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 5009,
-        "end": 5020
+        "start": 504,
+        "end": 515
       },
       "ctxt": 1,
       "value": "handleInput",
@@ -80,15 +80,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 5056,
-        "end": 5068
+        "start": 551,
+        "end": 563
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 5056,
-          "end": 5066
+          "start": 551,
+          "end": 561
         },
         "ctxt": 1,
         "value": "inputValue",
@@ -107,15 +107,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 5080,
-        "end": 5092
+        "start": 575,
+        "end": 587
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 5080,
-          "end": 5090
+          "start": 575,
+          "end": 585
         },
         "ctxt": 1,
         "value": "isDisabled",
@@ -134,15 +134,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 5102,
-        "end": 5114
+        "start": 597,
+        "end": 609
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 5102,
-          "end": 5112
+          "start": 597,
+          "end": 607
         },
         "ctxt": 1,
         "value": "inputValue",
@@ -161,8 +161,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 5149,
-        "end": 5160
+        "start": 644,
+        "end": 655
       },
       "ctxt": 1,
       "value": "handleClick",
@@ -171,22 +171,22 @@ export const compiledTemplate = [
   },
   {
     "type": "static",
-    "content": ">Toggle Input</button><p>Status:"
+    "content": ">Toggle Input12</button><p>Status:"
   },
   {
     "type": "dynamic",
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 5200,
-        "end": 5215
+        "start": 697,
+        "end": 712
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 5200,
-          "end": 5213
+          "start": 697,
+          "end": 710
         },
         "ctxt": 1,
         "value": "getToggleText",
@@ -201,4 +201,4 @@ export const compiledTemplate = [
     "content": "</p></div></div>"
   }
 ];
-export const lastCompiled = 1750486879067;
+export const lastCompiled = 1750497319677;
