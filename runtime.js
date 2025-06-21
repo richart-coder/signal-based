@@ -4,7 +4,6 @@ import signal, { effect, computed } from "./signal.js";
 let lastCompiled = 0;
 
 const count = signal(0);
-const cssClass = signal("container");
 
 const inputValue = signal("");
 const isDisabled = signal(false);
@@ -23,7 +22,6 @@ const getIsDisabled = computed(() => {
 const context = {
   title,
   count,
-  cssClass,
   handleInput,
   inputValue,
   isDisabled,

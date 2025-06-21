@@ -1,5 +1,5 @@
 // prettier-ignore
-<div className={cssClass()}>
+<div className="container">
   <h1>{title()}</h1>
   <div>
     <p>Count: {count()}</p>

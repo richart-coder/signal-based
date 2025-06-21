@@ -175,141 +175,178 @@ export default function generateReactiveTemplate(merged, { context, effect }) {
 
   return {
     mount(container) {
-      const elementBindings = new Map();
+      const textBindingsToProcess = [];
 
-      let processedTemplate = template;
+      const { processedTemplate, elementBindings } = (() => {
+        const elementBindings = new Map();
+        let processedTemplate = template;
+        let elementCounter = 0;
+        const elementIdMap = new Map();
 
-      let elementCounter = 0;
-      const elementIdMap = new Map();
+        dynamicBindings.forEach(({ index, info, binding }) => {
+          switch (info.type) {
+            case "attr":
+            case "event":
+              const result = processElementBinding({
+                index,
+                info,
+                processedTemplate,
+                elementCounter,
+                elementIdMap,
+              });
 
-      dynamicBindings.forEach(({ index, info, binding }) => {
-        if (info.type === "attr") {
-          const oldPattern = `"{{ATTR_${index}}}"`;
+              processedTemplate = result.processedTemplate;
+              elementCounter = result.elementCounter;
 
-          const templateUpToHere = processedTemplate.substring(
-            0,
-            processedTemplate.indexOf(oldPattern)
-          );
-          const elementPosition = templateUpToHere.lastIndexOf("<");
-
-          let elementId;
-          if (elementIdMap.has(elementPosition)) {
-            elementId = elementIdMap.get(elementPosition);
-          } else {
-            elementId = `element-${elementCounter++}`;
-            elementIdMap.set(elementPosition, elementId);
+              if (!elementBindings.has(result.elementId)) {
+                elementBindings.set(result.elementId, []);
+              }
+              elementBindings.get(result.elementId).push({
+                type: info.type,
+                info,
+                binding,
+              });
+              break;
+            case "text":
+              textBindingsToProcess.push({ index, info, binding });
+              break;
           }
+        });
 
-          const newPattern = `"" data-element-id="${elementId}"`;
-          processedTemplate = processedTemplate.replace(oldPattern, newPattern);
-
-          if (!elementBindings.has(elementId)) {
-            elementBindings.set(elementId, []);
-          }
-          elementBindings.get(elementId).push({ type: "attr", info, binding });
-        } else if (info.type === "event") {
-          const oldPattern = `"{{EVENT_${index}}}"`;
-
-          const templateUpToHere = processedTemplate.substring(
-            0,
-            processedTemplate.indexOf(oldPattern)
-          );
-          const elementPosition = templateUpToHere.lastIndexOf("<");
-
-          let elementId;
-          if (elementIdMap.has(elementPosition)) {
-            elementId = elementIdMap.get(elementPosition);
-          } else {
-            elementId = `element-${elementCounter++}`;
-            elementIdMap.set(elementPosition, elementId);
-          }
-
-          const newPattern = `"" data-element-id="${elementId}"`;
-          processedTemplate = processedTemplate.replace(oldPattern, newPattern);
-
-          if (!elementBindings.has(elementId)) {
-            elementBindings.set(elementId, []);
-          }
-          elementBindings.get(elementId).push({ type: "event", info, binding });
-        }
-      });
+        return { processedTemplate, elementBindings };
+      })();
 
       container.innerHTML = processedTemplate;
 
-      elementBindings.forEach((bindings, elementId) => {
-        const element = container.querySelector(
-          `[data-element-id="${elementId}"]`
-        );
-
-        if (element) {
-          element.removeAttribute("data-element-id");
-
-          bindings.forEach(({ type, info, binding }) => {
-            if (type === "attr") {
-              const attrName = info.name;
-
-              if (effect) {
-                effect(() => {
-                  const value = binding();
-                  const isBooleanAttr = booleanAttrSet.has(attrName);
-                  const shouldSetAttribute = isBooleanAttr
-                    ? value
-                    : value != null && value !== false;
-                  const attrValue = isBooleanAttr ? "" : String(value);
-
-                  if (shouldSetAttribute) {
-                    element.setAttribute(attrName, attrValue);
-                  } else {
-                    element.removeAttribute(attrName);
-                  }
-                });
-              } else {
-                console.warn("❌ effect 函數不存在");
-              }
-            } else if (type === "event") {
-              const eventName = info.name;
-
-              const actualEventName = eventName.startsWith("on")
-                ? eventName.slice(2).toLowerCase()
-                : eventName.toLowerCase();
-
-              const handler = binding();
-              if (typeof handler === "function") {
-                element.addEventListener(actualEventName, handler);
-                element.removeAttribute(eventName);
-              } else {
-                console.warn(`❌ 事件處理器不是函數: ${typeof handler}`);
-              }
-            }
-          });
-        }
-      });
-
-      dynamicBindings.forEach(({ index, info, binding }) => {
-        if (info.type === "text") {
-          const walker = document.createTreeWalker(
-            container,
-            NodeFilter.SHOW_COMMENT,
-            null
-          );
-
-          let comment;
-          while ((comment = walker.nextNode())) {
-            if (comment.textContent === `TEXT_${index}`) {
-              const textNode = document.createTextNode("");
-              comment.parentNode?.replaceChild(textNode, comment);
-
-              if (effect) {
-                effect(() => {
-                  const value = binding();
-                  textNode.textContent = value ?? "";
-                });
-              }
-              break;
-            }
-          }
-        }
-      });
+      applyElementBindings(elementBindings, container, effect);
+      applyTextBindings(container, textBindingsToProcess, effect);
     },
   };
 }
+
+const processElementBinding = ({
+  index,
+  info,
+  processedTemplate,
+  elementCounter,
+  elementIdMap,
+}) => {
+  const patternType = info.type === "attr" ? "ATTR" : "EVENT";
+  const oldPattern = `"{{${patternType}_${index}}}"`;
+
+  const templateUpToHere = processedTemplate.substring(
+    0,
+    processedTemplate.indexOf(oldPattern)
+  );
+  const elementPosition = templateUpToHere.lastIndexOf("<");
+
+  let elementId;
+  if (elementIdMap.has(elementPosition)) {
+    elementId = elementIdMap.get(elementPosition);
+  } else {
+    elementId = `element-${elementCounter++}`;
+    elementIdMap.set(elementPosition, elementId);
+  }
+
+  const newPattern = `"" data-element-id="${elementId}"`;
+  const updatedTemplate = processedTemplate.replace(oldPattern, newPattern);
+
+  return {
+    elementId,
+    processedTemplate: updatedTemplate,
+    elementCounter,
+  };
+};
+
+const applyElementBindings = (elementBindings, container, effect) => {
+  elementBindings.forEach((bindings, elementId) => {
+    const element = container.querySelector(`[data-element-id="${elementId}"]`);
+
+    if (element) {
+      element.removeAttribute("data-element-id");
+
+      bindings.forEach(({ type, info, binding }) => {
+        switch (type) {
+          case "attr":
+            effect(watchAttr(element, info, binding));
+            break;
+          case "event":
+            applyEventBinding(element, info, binding);
+            break;
+        }
+      });
+    }
+  });
+};
+
+const watchAttr = (element, info, binding) => {
+  const attrName = info.name;
+
+  return () => {
+    const value = binding();
+    const isBooleanAttr = booleanAttrSet.has(attrName);
+    const shouldSetAttribute = isBooleanAttr
+      ? value
+      : value != null && value !== false;
+    const attrValue = isBooleanAttr ? "" : String(value);
+
+    if (shouldSetAttribute) {
+      element.setAttribute(attrName, attrValue);
+    } else {
+      element.removeAttribute(attrName);
+    }
+  };
+};
+
+const applyEventBinding = (element, info, binding) => {
+  const eventName = info.name;
+  const actualEventName = eventName.startsWith("on")
+    ? eventName.slice(2).toLowerCase()
+    : eventName.toLowerCase();
+
+  const handler = binding();
+  if (typeof handler === "function") {
+    element.addEventListener(actualEventName, handler);
+    element.removeAttribute(eventName);
+  } else {
+    console.warn(`❌ 事件處理器不是函數: ${typeof handler}`);
+  }
+};
+
+const traverseComment = (container) => {
+  const walker = document.createTreeWalker(
+    container,
+    NodeFilter.SHOW_COMMENT,
+    null
+  );
+  const commentMap = new Map();
+  let comment;
+  while ((comment = walker.nextNode())) {
+    const match = comment.textContent?.match(/^TEXT_(\d+)$/);
+    if (match) {
+      const index = parseInt(match[1], 10);
+      commentMap.set(index, comment);
+    }
+  }
+  return commentMap;
+};
+
+const watchText = (textNode, binding) => {
+  return () => {
+    const value = binding();
+    textNode.textContent = value ?? "";
+  };
+};
+const applyTextBindings = (container, textBindingsToProcess, effect) => {
+  if (textBindingsToProcess.length === 0) return;
+  const commentMap = traverseComment(container);
+
+  textBindingsToProcess.forEach(({ index, _, binding }) => {
+    const comment = commentMap.get(index);
+    if (comment) {
+      const textNode = document.createTextNode("");
+      comment.parentNode?.replaceChild(textNode, comment);
+      effect(watchText(textNode, binding));
+    }
+  });
+};

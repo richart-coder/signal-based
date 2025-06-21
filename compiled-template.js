@@ -2,49 +2,22 @@
 export const compiledTemplate = [
   {
     "type": "static",
-    "content": "<div className="
+    "content": "<div className=\"container\"><h1>"
   },
   {
     "type": "dynamic",
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 8140,
-        "end": 8150
+        "start": 4927,
+        "end": 4934
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 8140,
-          "end": 8148
-        },
-        "ctxt": 1,
-        "value": "cssClass",
-        "optional": false
-      },
-      "arguments": [],
-      "typeArguments": null
-    }
-  },
-  {
-    "type": "static",
-    "content": "><h1>"
-  },
-  {
-    "type": "dynamic",
-    "expression": {
-      "type": "CallExpression",
-      "span": {
-        "start": 8160,
-        "end": 8167
-      },
-      "ctxt": 0,
-      "callee": {
-        "type": "Identifier",
-        "span": {
-          "start": 8160,
-          "end": 8165
+          "start": 4927,
+          "end": 4932
         },
         "ctxt": 1,
         "value": "title",
@@ -63,15 +36,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 8197,
-        "end": 8204
+        "start": 4964,
+        "end": 4971
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 8197,
-          "end": 8202
+          "start": 4964,
+          "end": 4969
         },
         "ctxt": 1,
         "value": "count",
@@ -90,8 +63,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 8242,
-        "end": 8253
+        "start": 5009,
+        "end": 5020
       },
       "ctxt": 1,
       "value": "handleInput",
@@ -107,15 +80,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 8289,
-        "end": 8301
+        "start": 5056,
+        "end": 5068
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 8289,
-          "end": 8299
+          "start": 5056,
+          "end": 5066
         },
         "ctxt": 1,
         "value": "inputValue",
@@ -134,15 +107,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 8313,
-        "end": 8325
+        "start": 5080,
+        "end": 5092
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 8313,
-          "end": 8323
+          "start": 5080,
+          "end": 5090
         },
         "ctxt": 1,
         "value": "isDisabled",
@@ -161,15 +134,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 8335,
-        "end": 8347
+        "start": 5102,
+        "end": 5114
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 8335,
-          "end": 8345
+          "start": 5102,
+          "end": 5112
         },
         "ctxt": 1,
         "value": "inputValue",
@@ -188,8 +161,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 8382,
-        "end": 8393
+        "start": 5149,
+        "end": 5160
       },
       "ctxt": 1,
       "value": "handleClick",
@@ -205,15 +178,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 8433,
-        "end": 8448
+        "start": 5200,
+        "end": 5215
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 8433,
-          "end": 8446
+          "start": 5200,
+          "end": 5213
         },
         "ctxt": 1,
         "value": "getToggleText",
@@ -228,4 +201,4 @@ export const compiledTemplate = [
     "content": "</p></div></div>"
   }
 ];
-export const lastCompiled = 1750475435387;
+export const lastCompiled = 1750486879067;
