@@ -1,3 +1,6 @@
+import linearSplit from "./linearSplit.js";
+import createFunction from "./createFunction.js";
+
 const booleanAttrSet = new Set([
   "disabled",
   "checked",
@@ -6,18 +9,21 @@ const booleanAttrSet = new Set([
   "readonly",
 ]);
 
+const BINDING_PATTERNS = {
+  REACT_EVENT: /\s+(on[A-Z][a-zA-Z]*)\s*=\s*$/,
+  ATTR: /\s+([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*$/,
+  TEXT_END: />[\s]*$/,
+};
+
 function detectBindingType(templateSoFar) {
   const context = templateSoFar.slice(-200);
 
-  const reactEventMatch = context.match(/\s+(on[A-Z][a-zA-Z]*)\s*=\s*$/);
+  const reactEventMatch = context.match(BINDING_PATTERNS.REACT_EVENT);
   if (reactEventMatch) {
-    return {
-      type: "event",
-      name: reactEventMatch[1],
-    };
+    return { type: "event", name: reactEventMatch[1] };
   }
 
-  const attrMatch = context.match(/\s+([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*$/);
+  const attrMatch = context.match(BINDING_PATTERNS.ATTR);
   if (attrMatch) {
     return {
       type: "attr",
@@ -25,125 +31,12 @@ function detectBindingType(templateSoFar) {
     };
   }
 
-  if (context.match(/>[\s]*$/)) {
-    return { type: "text" };
-  }
-
   return { type: "text" };
 }
 
-function createFunction(expressionNode, context) {
-  if (expressionNode.type === "CallExpression") {
-    const functionName = expressionNode.callee.value;
-    return () => {
-      if (context && functionName in context) {
-        return context[functionName]();
-      }
-      const env = typeof window === "undefined" ? globalThis : window;
-      const result = env[functionName]?.();
-      if (result == undefined && !(functionName in env)) {
-        console.warn(`函數 "${functionName}" 不存在`);
-      }
-      return result;
-    };
-  }
+export default function generateReactiveTemplate(input, { context, effect }) {
+  const merged = Array.isArray(input) ? input : linearSplit(input);
 
-  if (expressionNode.type === "Identifier") {
-    const functionName = expressionNode.value;
-    return () => {
-      if (context && functionName in context) {
-        return context[functionName];
-      }
-      const env = typeof window === "undefined" ? globalThis : window;
-      const result = env[functionName];
-      if (result == undefined && !(functionName in env)) {
-        console.warn(`函數 "${functionName}" 不存在`);
-      }
-      return result;
-    };
-  }
-
-  if (expressionNode.type === "ConditionalExpression") {
-    const testFn = createFunction(expressionNode.test, context);
-    const consequentFn = createFunction(expressionNode.consequent, context);
-    const alternateFn = createFunction(expressionNode.alternate, context);
-    return () => {
-      const testResult = testFn();
-      return testResult ? consequentFn() : alternateFn();
-    };
-  }
-
-  if (expressionNode.type === "StringLiteral") {
-    const value = expressionNode.value;
-    return () => value;
-  }
-
-  if (expressionNode.type === "NumericLiteral") {
-    const value = expressionNode.value;
-    return () => value;
-  }
-
-  if (expressionNode.type === "BooleanLiteral") {
-    const value = expressionNode.value;
-    return () => value;
-  }
-
-  if (expressionNode.type === "JSXEmptyExpression") {
-    return () => "";
-  }
-
-  if (expressionNode.type === "BinaryExpression") {
-    const leftFn = createFunction(expressionNode.left, context);
-    const rightFn = createFunction(expressionNode.right, context);
-    const operator = expressionNode.operator;
-
-    return () => {
-      const left = leftFn();
-      const right = rightFn();
-
-      switch (operator) {
-        case "+":
-          return left + right;
-        case "-":
-          return left - right;
-        case "*":
-          return left * right;
-        case "/":
-          return left / right;
-        case "%":
-          return left % right;
-        case "===":
-          return left === right;
-        case "!==":
-          return left !== right;
-        case "==":
-          return left == right;
-        case "!=":
-          return left != right;
-        case ">":
-          return left > right;
-        case "<":
-          return left < right;
-        case ">=":
-          return left >= right;
-        case "<=":
-          return left <= right;
-        case "&&":
-          return left && right;
-        case "||":
-          return left || right;
-        default:
-          console.warn(`不支援的二元運算符: ${operator}`);
-          return undefined;
-      }
-    };
-  }
-
-  console.error("不支援的表達式:", expressionNode);
-  throw new Error(`不支援的表達式類型：${expressionNode.type}`);
-}
-
-export default function generateReactiveTemplate(merged, { context, effect }) {
   let template = "";
   const dynamicBindings = [];
   let bindingIndex = 0;
@@ -155,12 +48,15 @@ export default function generateReactiveTemplate(merged, { context, effect }) {
       const bindingInfo = detectBindingType(template);
       const bindingId = `binding-${bindingIndex}`;
 
-      if (bindingInfo.type === "attr") {
-        template += `"{{ATTR_${bindingIndex}}}"`;
-      } else if (bindingInfo.type === "event") {
-        template += `"{{EVENT_${bindingIndex}}}"`;
-      } else {
-        template += `<!--TEXT_${bindingIndex}-->`;
+      switch (bindingInfo.type) {
+        case "attr":
+          template += `"{{ATTR_${bindingIndex}}}"`;
+          break;
+        case "event":
+          template += `"{{EVENT_${bindingIndex}}}"`;
+          break;
+        default:
+          template += `<!--TEXT_${bindingIndex}-->`;
       }
 
       dynamicBindings.push({
@@ -172,53 +68,55 @@ export default function generateReactiveTemplate(merged, { context, effect }) {
       bindingIndex++;
     }
   });
-  const textBindingsToProcess = [];
-  const { processedTemplate, elementBindings } = (() => {
-    const elementBindings = new Map();
-    let processedTemplate = template;
-    let elementCounter = 0;
-    const elementIdMap = new Map();
 
-    dynamicBindings.forEach(({ index, info, binding }) => {
-      switch (info.type) {
-        case "attr":
-        case "event":
-          const result = processElementBinding({
-            index,
-            info,
-            processedTemplate,
-            elementCounter,
-            elementIdMap,
-          });
+  const { processedTemplate, elementBindings, textBindingsToProcess } =
+    processBindings(template, dynamicBindings);
 
-          processedTemplate = result.processedTemplate;
-          elementCounter = result.elementCounter;
-
-          if (!elementBindings.has(result.elementId)) {
-            elementBindings.set(result.elementId, []);
-          }
-          elementBindings.get(result.elementId).push({
-            type: info.type,
-            info,
-            binding,
-          });
-          break;
-        case "text":
-          textBindingsToProcess.push({ index, info, binding });
-          break;
-      }
-    });
-
-    return { processedTemplate, elementBindings };
-  })();
   return {
     mount(container) {
       container.innerHTML = processedTemplate;
-
       applyElementBindings(elementBindings, container, effect);
-      applyTextBindings(container, textBindingsToProcess, effect);
+      applyTextBindings(container, textBindingsToProcess, effect, context);
+      applyJSXEventBindings(container, context);
     },
   };
+}
+
+function processBindings(template, dynamicBindings) {
+  const elementBindings = new Map();
+  const textBindingsToProcess = [];
+  let processedTemplate = template;
+  let elementCounter = 0;
+  const elementIdMap = new Map();
+
+  dynamicBindings.forEach(({ index, info, binding }) => {
+    if (info.type === "text") {
+      textBindingsToProcess.push({ index, info, binding });
+      return;
+    }
+
+    const result = processElementBinding({
+      index,
+      info,
+      processedTemplate,
+      elementCounter,
+      elementIdMap,
+    });
+
+    processedTemplate = result.processedTemplate;
+    elementCounter = result.elementCounter;
+
+    if (!elementBindings.has(result.elementId)) {
+      elementBindings.set(result.elementId, []);
+    }
+    elementBindings.get(result.elementId).push({
+      type: info.type,
+      info,
+      binding,
+    });
+  });
+
+  return { processedTemplate, elementBindings, textBindingsToProcess };
 }
 
 const processElementBinding = ({
@@ -228,69 +126,123 @@ const processElementBinding = ({
   elementCounter,
   elementIdMap,
 }) => {
-  const patternType = info.type === "attr" ? "ATTR" : "EVENT";
-  const oldPattern = `"{{${patternType}_${index}}}"`;
-
-  const templateUpToHere = processedTemplate.substring(
-    0,
-    processedTemplate.indexOf(oldPattern)
-  );
-  const elementPosition = templateUpToHere.lastIndexOf("<");
-
   let elementId;
-  if (elementIdMap.has(elementPosition)) {
-    elementId = elementIdMap.get(elementPosition);
+  let updatedTemplate;
+
+  if (info.type === "event") {
+    const eventAttrPattern = new RegExp(
+      `\\s+${info.name}\\s*=\\s*"{{EVENT_${index}}}"`
+    );
+
+    const matchIndex = processedTemplate.search(eventAttrPattern);
+    if (matchIndex === -1) {
+      console.warn(`未找到事件屬性模式: ${info.name}`);
+      return { elementId: null, processedTemplate, elementCounter };
+    }
+
+    const beforeEventAttr = processedTemplate.substring(0, matchIndex);
+    const elementPosition = beforeEventAttr.lastIndexOf("<");
+
+    elementId = getOrCreateElementId(
+      elementPosition,
+      elementIdMap,
+      elementCounter++
+    );
+
+    const hasDataElementId = processedTemplate.includes(
+      `data-element-id="${elementId}"`
+    );
+
+    updatedTemplate = processedTemplate.replace(
+      eventAttrPattern,
+      hasDataElementId ? "" : ` data-element-id="${elementId}"`
+    );
   } else {
-    elementId = `element-${elementCounter++}`;
-    elementIdMap.set(elementPosition, elementId);
+    const oldPattern = `"{{ATTR_${index}}}"`;
+    const patternIndex = processedTemplate.indexOf(oldPattern);
+
+    if (patternIndex === -1) {
+      console.warn(`未找到屬性模式: ${oldPattern}`);
+      return { elementId: null, processedTemplate, elementCounter };
+    }
+
+    const templateUpToHere = processedTemplate.substring(0, patternIndex);
+    const elementPosition = templateUpToHere.lastIndexOf("<");
+
+    elementId = getOrCreateElementId(
+      elementPosition,
+      elementIdMap,
+      elementCounter++
+    );
+
+    const hasDataElementId = processedTemplate.includes(
+      `data-element-id="${elementId}"`
+    );
+    const newPattern = hasDataElementId
+      ? '""'
+      : `"" data-element-id="${elementId}"`;
+
+    updatedTemplate = processedTemplate.replace(oldPattern, newPattern);
   }
 
-  const newPattern = `"" data-element-id="${elementId}"`;
-  const updatedTemplate = processedTemplate.replace(oldPattern, newPattern);
-
-  return {
-    elementId,
-    processedTemplate: updatedTemplate,
-    elementCounter,
-  };
+  return { elementId, processedTemplate: updatedTemplate, elementCounter };
 };
+
+function getOrCreateElementId(position, elementIdMap, counter) {
+  if (elementIdMap.has(position)) {
+    return elementIdMap.get(position);
+  }
+
+  const elementId = `element-${counter}`;
+  elementIdMap.set(position, elementId);
+  return elementId;
+}
 
 const applyElementBindings = (elementBindings, container, effect) => {
   elementBindings.forEach((bindings, elementId) => {
     const element = container.querySelector(`[data-element-id="${elementId}"]`);
+    if (!element) return;
 
-    if (element) {
-      element.removeAttribute("data-element-id");
+    element.removeAttribute("data-element-id");
 
-      bindings.forEach(({ type, info, binding }) => {
-        switch (type) {
-          case "attr":
-            effect(watchAttr(element, info, binding));
-            break;
-          case "event":
-            applyEventBinding(element, info, binding);
-            break;
-        }
-      });
-    }
+    bindings.forEach(({ type, info, binding }) => {
+      if (type === "attr") {
+        effect(watchAttr(element, info, binding));
+      } else if (type === "event") {
+        applyEventBinding(element, info, binding);
+      }
+    });
   });
 };
 
 const watchAttr = (element, info, binding) => {
-  const attrName = info.name;
+  const { name: attrName } = info;
+  const isInput = element.tagName === "INPUT";
+  const isSelect = element.tagName === "SELECT";
+  const isBooleanAttr = booleanAttrSet.has(attrName);
+  const isValueAttr = attrName === "value";
 
   return () => {
     const value = binding();
-    const isBooleanAttr = booleanAttrSet.has(attrName);
-    const shouldSetAttribute = isBooleanAttr
-      ? value
-      : value != null && value !== false;
+
+    if (value == null || value === false) {
+      element.removeAttribute(attrName);
+
+      if ((isInput || isSelect) && isValueAttr) {
+        element.value = "";
+      }
+      return;
+    }
+
     const attrValue = isBooleanAttr ? "" : String(value);
+    const shouldSetAttribute = isBooleanAttr ? value : true;
 
     if (shouldSetAttribute) {
       element.setAttribute(attrName, attrValue);
-    } else {
-      element.removeAttribute(attrName);
+
+      if ((isInput || isSelect) && isValueAttr) {
+        element.value = attrValue;
+      }
     }
   };
 };
@@ -301,13 +253,32 @@ const applyEventBinding = (element, info, binding) => {
     ? eventName.slice(2).toLowerCase()
     : eventName.toLowerCase();
 
+  [eventName, eventName.toLowerCase(), actualEventName].forEach((name) => {
+    element.removeAttribute(name);
+    element[name] = null;
+  });
+
   const handler = binding();
-  if (typeof handler === "function") {
-    element.addEventListener(actualEventName, handler);
-    element.removeAttribute(eventName);
-  } else {
+  if (typeof handler !== "function") {
     console.warn(`❌ 事件處理器不是函數: ${typeof handler}`);
+    return;
   }
+
+  const wrappedHandler = (event) => {
+    try {
+      return handler(event);
+    } catch (error) {
+      console.error("❌ 事件處理錯誤:", error);
+    }
+  };
+
+  element.addEventListener(actualEventName, wrappedHandler);
+
+  setTimeout(() => {
+    [eventName, eventName.toLowerCase(), actualEventName].forEach((name) => {
+      element.removeAttribute(name);
+    });
+  }, 0);
 };
 
 const traverseComment = (container) => {
@@ -316,34 +287,143 @@ const traverseComment = (container) => {
     NodeFilter.SHOW_COMMENT,
     null
   );
+
   const commentMap = new Map();
   let comment;
+
   while ((comment = walker.nextNode())) {
     const match = comment.textContent?.match(/^TEXT_(\d+)$/);
     if (match) {
-      const index = parseInt(match[1], 10);
-      commentMap.set(index, comment);
+      commentMap.set(parseInt(match[1], 10), comment);
     }
   }
+
   return commentMap;
 };
 
-const watchText = (textNode, binding) => {
+const HTML_TAG_PATTERN = /<\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/;
+const FALSY_VALUES = new Set([false, null, undefined, ""]);
+
+const isValidHTML = (str) => {
+  return (
+    typeof str === "string" && str.includes("<") && HTML_TAG_PATTERN.test(str)
+  );
+};
+
+const isEqual = (a, b) => Object.is(a, b);
+
+const watchChildren = (elNode, binding, context) => {
+  let previousValue = null;
+  let managedNodes = [];
+
+  const clearManagedNodes = () => {
+    if (managedNodes.length === 0) return;
+
+    managedNodes.forEach((node) => {
+      if (node?.parentNode === elNode) {
+        elNode.removeChild(node);
+      }
+    });
+    managedNodes = [];
+  };
+
+  const createNodesFromValue = (value) => {
+    if (FALSY_VALUES.has(value)) return [];
+
+    const nodes = [];
+    const items = Array.isArray(value) ? value : [value];
+
+    items.forEach((item) => {
+      if (FALSY_VALUES.has(item)) return;
+
+      if (isValidHTML(item)) {
+        const template = document.createElement("template");
+        template.innerHTML = item;
+        Array.from(template.content.childNodes).forEach((child) => {
+          nodes.push(child);
+        });
+      } else {
+        const textContent = String(item);
+        if (textContent) {
+          nodes.push(document.createTextNode(textContent));
+        }
+      }
+    });
+
+    return nodes;
+  };
+
   return () => {
     const value = binding();
-    textNode.textContent = value ?? "";
+
+    if (isEqual(value, previousValue)) return;
+
+    clearManagedNodes();
+
+    const newNodes = createNodesFromValue(value);
+
+    if (newNodes.length > 0) {
+      const fragment = document.createDocumentFragment();
+      newNodes.forEach((node) => {
+        fragment.appendChild(node);
+        managedNodes.push(node);
+      });
+      elNode.appendChild(fragment);
+
+      if (context) {
+        applyJSXEventBindings(elNode, context);
+      }
+    }
+
+    previousValue = value;
   };
 };
-const applyTextBindings = (container, textBindingsToProcess, effect) => {
+
+const applyTextBindings = (
+  container,
+  textBindingsToProcess,
+  effect,
+  context
+) => {
   if (textBindingsToProcess.length === 0) return;
+
   const commentMap = traverseComment(container);
 
-  textBindingsToProcess.forEach(({ index, _, binding }) => {
+  textBindingsToProcess.forEach(({ index, binding }) => {
     const comment = commentMap.get(index);
     if (comment) {
-      const textNode = document.createTextNode("");
-      comment.parentNode?.replaceChild(textNode, comment);
-      effect(watchText(textNode, binding));
+      effect(watchChildren(comment.parentNode, binding, context));
     }
   });
 };
+
+function applyJSXEventBindings(container, context) {
+  container.querySelectorAll("[data-jsx-event]").forEach((element) => {
+    const eventData = element.getAttribute("data-jsx-event");
+    const [eventType, functionName] = eventData.split(":");
+
+    let handler = null;
+
+    if (functionName.startsWith("__jsx_")) {
+      const globalEnv =
+        typeof window !== "undefined"
+          ? window
+          : typeof global !== "undefined"
+          ? global
+          : {};
+
+      if (globalEnv.__jsxEventHandlers?.[functionName]) {
+        handler = globalEnv.__jsxEventHandlers[functionName];
+
+        delete globalEnv.__jsxEventHandlers[functionName];
+      }
+    } else if (context?.[functionName]) {
+      handler = context[functionName];
+    }
+
+    if (handler && typeof handler === "function") {
+      element.addEventListener(eventType, handler);
+      element.removeAttribute("data-jsx-event");
+    }
+  });
+}
