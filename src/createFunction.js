@@ -203,33 +203,6 @@ const ATTR_REMOVE_PATTERN = /\s+[a-zA-Z][a-zA-Z0-9-]*\s*=\s*$/;
 
 const functionNameCache = new WeakMap();
 
-const findFunctionNameInContext = (targetFunction, context) => {
-  if (!context || typeof targetFunction !== "function") {
-    return "unknownFunction";
-  }
-
-  let contextCache = functionNameCache.get(context);
-  if (!contextCache) {
-    contextCache = new Map();
-    functionNameCache.set(context, contextCache);
-  }
-
-  if (contextCache.has(targetFunction)) {
-    return contextCache.get(targetFunction);
-  }
-
-  for (const [key, fn] of Object.entries(context)) {
-    if (fn === targetFunction) {
-      contextCache.set(targetFunction, key);
-      return key;
-    }
-  }
-
-  const fallback = "unknownFunction";
-  contextCache.set(targetFunction, fallback);
-  return fallback;
-};
-
 function handleJSXElement(node, context) {
   return () => {
     const sequence = linearSplit(node);
