@@ -58,25 +58,6 @@ count.set(5);
 </div>
 ```
 
-### 3. 應用初始化
-
-```javascript
-import generateReactiveTemplate from "./generateReactiveTemplate.js";
-
-const context = {
-  count,
-  doubleCount,
-  increment: () => count.set(count() + 1),
-};
-
-const template = generateReactiveTemplate(compiledTemplate, {
-  context,
-  effect,
-});
-
-template.mount(document.getElementById("app"));
-```
-
 ### 工作流程
 
 1. **模板解析**: 將 JSX 語法解析為靜態和動態部分
