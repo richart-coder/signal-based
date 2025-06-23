@@ -1,6 +1,6 @@
 import { parseSync } from "@swc/core";
-import linearSplit from "./src/linearSplit.js";
-import mergeStaticParts from "./src/mergeStaticParts.js";
+import convertJSXToTemplateParts from "./src/convertJSXToTemplateParts.js";
+
 import fs from "fs";
 import chokidar from "chokidar";
 
@@ -10,11 +10,9 @@ function compileJSX(jsxContent) {
     jsx: true,
   });
 
-  const sequence = linearSplit(ast);
-  const merged = mergeStaticParts(sequence);
-
+  const templateParts = convertJSXToTemplateParts(ast);
   const compiledData = `
-export const compiledTemplate = ${JSON.stringify(merged, null, 2)};
+export const compiledTemplate = ${JSON.stringify(templateParts, null, 2)};
 export const lastCompiled = ${Date.now()};
 `;
 

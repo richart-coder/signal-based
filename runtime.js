@@ -237,7 +237,6 @@ async function loadAndMount() {
     );
 
     if (currentTemplateInstance === reactiveTemplate) {
-      console.log("⏭️ 跳過：使用相同的模板實例");
       return;
     }
 

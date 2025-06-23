@@ -57,10 +57,10 @@ function detectBindingType(templateSoFar) {
   return { type: "text" };
 }
 
-export default function generateReactiveTemplate(input, { context, effect }) {
-  const templateParts = Array.isArray(input)
-    ? input
-    : convertJSXToTemplateParts(input);
+export default function generateReactiveTemplate(
+  templateParts,
+  { context, effect }
+) {
   let bindingIndex = 0;
   const dynamicBindings = [];
 

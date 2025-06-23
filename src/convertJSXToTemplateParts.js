@@ -1,4 +1,13 @@
 //@ts-nocheck
+const SAFE_TO_TRAVERSE = [
+  "Program",
+  "BlockStatement",
+  "ExpressionStatement",
+  "JSXFragment",
+  "JSXElement",
+  "JSXText",
+  "JSXExpressionContainer",
+];
 export default function convertJSXToTemplateParts(ast) {
   const sequence = [];
 
@@ -63,7 +72,6 @@ export default function convertJSXToTemplateParts(ast) {
     switch (node.type) {
       case "JSXElement":
         processOpeningElement(node.opening);
-
         node.children?.forEach(traverse);
         if (!node.opening.selfClosing && node.closing) {
           processClosingElement(node.opening.name.value);
@@ -86,17 +94,65 @@ export default function convertJSXToTemplateParts(ast) {
         node.body?.forEach(traverse);
         break;
 
+      case "ConditionalExpression":
+        processExpression(node);
+        break;
+
+      case "LogicalExpression":
+        processExpression(node);
+        break;
+
+      case "ArrowFunctionExpression":
+        processExpression(node);
+        break;
+
+      case "CallExpression":
+        processExpression(node);
+        break;
+
+      case "MemberExpression":
+        processExpression(node);
+        break;
+
       default:
-        Object.values(node).forEach((child) => {
-          if (Array.isArray(child)) {
-            child.forEach(traverse);
-          } else if (child?.type) {
-            traverse(child);
-          }
-        });
+        if (safeToTraverse.includes(node.type)) {
+          Object.values(node).forEach((child) => {
+            if (Array.isArray(child)) {
+              child.forEach(traverse);
+            } else if (child?.type) {
+              traverse(child);
+            }
+          });
+        } else {
+          processExpression(node);
+        }
     }
   }
 
   traverse(ast);
-  return sequence;
+
+  return mergeStaticParts(sequence);
+}
+
+function mergeStaticParts(sequence) {
+  const merged = [];
+  let currentStatic = "";
+
+  sequence.forEach((item) => {
+    if (item.type === "static") {
+      currentStatic += item.content;
+    } else {
+      if (currentStatic) {
+        merged.push({ type: "static", content: currentStatic });
+        currentStatic = "";
+      }
+      merged.push(item);
+    }
+  });
+
+  if (currentStatic) {
+    merged.push({ type: "static", content: currentStatic });
+  }
+
+  return merged;
 }

@@ -177,10 +177,26 @@ function handleOptionalCallExpression(node, context) {
 
 function handleConditionalExpression(node, context) {
   const testFn = createFunction(node.test, context);
-  const consequentFn = createFunction(node.consequent, context);
-  const alternateFn = createFunction(node.alternate, context);
 
-  return () => (testFn() ? consequentFn() : alternateFn());
+  return () => {
+    const testResult = testFn();
+
+    if (testResult) {
+      if (node.consequent.type === "JSXElement") {
+        return renderJSXElement(node.consequent, context);
+      }
+
+      const consequentFn = createFunction(node.consequent, context);
+      return consequentFn();
+    } else {
+      if (node.alternate.type === "JSXElement") {
+        return renderJSXElement(node.alternate, context);
+      }
+
+      const alternateFn = createFunction(node.alternate, context);
+      return alternateFn();
+    }
+  };
 }
 
 const createLiteralHandler = (value) => () => value;
@@ -201,56 +217,60 @@ function handleRegExpLiteral(node) {
 
 const ATTR_PATTERN = /\s+([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*$/;
 const ATTR_REMOVE_PATTERN = /\s+[a-zA-Z][a-zA-Z0-9-]*\s*=\s*$/;
+function renderJSXElement(node, context) {
+  if (!node || node.type !== "JSXElement") {
+    return "";
+  }
 
-function handleJSXElement(node, context) {
-  return () => {
-    const sequence = convertJSXToTemplateParts(node);
-    let html = "";
+  const sequence = convertJSXToTemplateParts(node);
+  let html = "";
 
-    for (const item of sequence) {
-      if (item.type === "static") {
-        html += item.content;
-        continue;
-      }
-
-      const value = createFunction(item.expression, context)();
-      const attrMatch = html.match(ATTR_PATTERN);
-
-      if (attrMatch) {
-        const attrName = attrMatch[1];
-
-        const isEventAttr =
-          attrName.startsWith("on") && typeof value === "function";
-        const isFalsyAttr = value == null || value === "" || value === false;
-
-        if (isEventAttr) {
-          html = html.replace(ATTR_REMOVE_PATTERN, "");
-          const eventType = attrName.slice(2).toLowerCase();
-
-          const uniqueId =
-            Date.now().toString(36) + Math.random().toString(36).substr(2);
-          const functionName = `__jsx_${eventType}_${uniqueId}`;
-
-          if (typeof window !== "undefined") {
-            if (!window.__jsxEventHandlers) {
-              window.__jsxEventHandlers = {};
-            }
-            window.__jsxEventHandlers[functionName] = value;
-          }
-
-          html += ` data-jsx-event="${eventType}:${functionName}"`;
-        } else if (isFalsyAttr) {
-          html = html.replace(ATTR_REMOVE_PATTERN, "");
-        } else {
-          html += `"${escapeHtml(value)}"`;
-        }
-      } else if (value != null && typeof value !== "function") {
-        html += escapeHtml(value);
-      }
+  for (const item of sequence) {
+    if (item.type === "static") {
+      html += item.content;
+      continue;
     }
 
-    return html;
-  };
+    const value = createFunction(item.expression, context)();
+    const attrMatch = html.match(ATTR_PATTERN);
+
+    if (attrMatch) {
+      const attrName = attrMatch[1];
+
+      const isEventAttr =
+        attrName.startsWith("on") && typeof value === "function";
+      const isFalsyAttr = value == null || value === "" || value === false;
+
+      if (isEventAttr) {
+        html = html.replace(ATTR_REMOVE_PATTERN, "");
+        const eventType = attrName.slice(2).toLowerCase();
+
+        const uniqueId =
+          Date.now().toString(36) + Math.random().toString(36).substr(2);
+        const functionName = `__jsx_${eventType}_${uniqueId}`;
+
+        if (typeof window !== "undefined") {
+          if (!window.__jsxEventHandlers) {
+            window.__jsxEventHandlers = {};
+          }
+          window.__jsxEventHandlers[functionName] = value;
+        }
+
+        html += ` data-jsx-event="${eventType}:${functionName}"`;
+      } else if (isFalsyAttr) {
+        html = html.replace(ATTR_REMOVE_PATTERN, "");
+      } else {
+        html += `"${escapeHtml(value)}"`;
+      }
+    } else if (value != null && typeof value !== "function") {
+      html += escapeHtml(value);
+    }
+  }
+
+  return html;
+}
+function handleJSXElement(node, context) {
+  return () => renderJSXElement(node, context);
 }
 
 function handleUnaryExpression(node, context) {
@@ -390,22 +410,25 @@ function handleLogicalExpression(node, context) {
 }
 
 function handleTemplateLiteral(node, context) {
-  const quasisFunctions = node.quasis.map((quasi) => {
+  const quasisFunctions = node.quasis.map((quasi, index) => {
     const value =
       quasi.value?.raw || quasi.value?.cooked || quasi.raw || quasi.value || "";
     return () => value;
   });
-  const expressionFunctions = node.expressions.map((expr) =>
-    createFunction(expr, context)
-  );
+
+  const expressionFunctions = node.expressions.map((expr, index) => {
+    return createFunction(expr, context);
+  });
 
   return () => {
     let result = "";
     for (let i = 0; i < quasisFunctions.length; i++) {
-      result += quasisFunctions[i]();
+      const quasiValue = quasisFunctions[i]();
+      result += quasiValue;
+
       if (i < expressionFunctions.length) {
-        const value = expressionFunctions[i]();
-        result += value != null ? String(value) : "";
+        const exprValue = expressionFunctions[i]();
+        result += exprValue != null ? String(exprValue) : "";
       }
     }
     return result;
@@ -450,11 +473,12 @@ function handleBinaryExpression(node, context) {
     const operation = operators[operator];
 
     if (operation) {
-      return operation(left, right);
+      const result = operation(left, right);
+
+      return result;
     }
 
     console.warn(`不支援的二元運算符: ${operator}`);
-    return undefined;
   };
 }
 
