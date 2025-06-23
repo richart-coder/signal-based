@@ -95,21 +95,9 @@ export default function convertJSXToTemplateParts(ast) {
         break;
 
       case "ConditionalExpression":
-        processExpression(node);
-        break;
-
       case "LogicalExpression":
-        processExpression(node);
-        break;
-
       case "ArrowFunctionExpression":
-        processExpression(node);
-        break;
-
       case "CallExpression":
-        processExpression(node);
-        break;
-
       case "MemberExpression":
         processExpression(node);
         break;
