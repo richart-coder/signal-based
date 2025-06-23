@@ -1,4 +1,5 @@
-import linearSplit from "./linearSplit.js";
+//@ts-nocheck
+import convertJSXToTemplateParts from "./convertJSXToTemplateParts.js";
 
 const GLOBAL_ENV = typeof window === "undefined" ? globalThis : window;
 const FALSY_VALUES_FOR_JSX = new Set([false, null, undefined]);
@@ -201,11 +202,9 @@ function handleRegExpLiteral(node) {
 const ATTR_PATTERN = /\s+([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*$/;
 const ATTR_REMOVE_PATTERN = /\s+[a-zA-Z][a-zA-Z0-9-]*\s*=\s*$/;
 
-const functionNameCache = new WeakMap();
-
 function handleJSXElement(node, context) {
   return () => {
-    const sequence = linearSplit(node);
+    const sequence = convertJSXToTemplateParts(node);
     let html = "";
 
     for (const item of sequence) {
@@ -237,11 +236,6 @@ function handleJSXElement(node, context) {
               window.__jsxEventHandlers = {};
             }
             window.__jsxEventHandlers[functionName] = value;
-          } else if (typeof global !== "undefined") {
-            if (!global.__jsxEventHandlers) {
-              global.__jsxEventHandlers = {};
-            }
-            global.__jsxEventHandlers[functionName] = value;
           }
 
           html += ` data-jsx-event="${eventType}:${functionName}"`;

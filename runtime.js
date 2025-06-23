@@ -181,14 +181,12 @@ const handleDeleteClick = (id) => {
 };
 
 const context = {
-  // 狀態 signals
   todos,
   filteredTodos,
   newTodoText,
   filter,
   selectedPriority,
 
-  // 計算屬性
   activeTodoCount,
   completedTodoCount,
   totalTodoCount,
@@ -197,7 +195,6 @@ const context = {
   isAddButtonDisabled,
   isEmptyList,
 
-  // 事件處理器
   handleAddTodo,
   handleToggleTodo,
   handleDeleteTodo,
@@ -212,7 +209,6 @@ const context = {
   handleNewTodoKeyPress,
   handlePriorityChange,
 
-  // 工具函數
   getPriorityText,
   getPriorityColor,
   formatDate,

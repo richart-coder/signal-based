@@ -1,4 +1,5 @@
-export default function linearSplit(ast) {
+//@ts-nocheck
+export default function convertJSXToTemplateParts(ast) {
   const sequence = [];
 
   function processOpeningElement(openingElement) {

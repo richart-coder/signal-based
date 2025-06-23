@@ -1,4 +1,5 @@
-import linearSplit from "./linearSplit.js";
+//@ts-nocheck
+import convertJSXToTemplateParts from "./convertJSXToTemplateParts.js";
 import createFunction from "./createFunction.js";
 
 const booleanAttrSet = new Set([
@@ -35,13 +36,14 @@ function detectBindingType(templateSoFar) {
 }
 
 export default function generateReactiveTemplate(input, { context, effect }) {
-  const merged = Array.isArray(input) ? input : linearSplit(input);
+  const templateParts = Array.isArray(input)
+    ? input
+    : convertJSXToTemplateParts(input);
+  let bindingIndex = 0;
+  const dynamicBindings = [];
 
   let template = "";
-  const dynamicBindings = [];
-  let bindingIndex = 0;
-
-  merged.forEach((item) => {
+  templateParts.forEach((item) => {
     if (item.type === "static") {
       template += item.content;
     } else {
