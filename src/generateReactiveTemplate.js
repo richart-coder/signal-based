@@ -10,6 +10,28 @@ const booleanAttrSet = new Set([
   "readonly",
 ]);
 
+const interactiveElements = new Set(["SELECT", "OPTION", "TEXTAREA"]);
+const interactiveElementStateMap = new Map([
+  ["INPUT:text", "value"],
+  ["INPUT:password", "value"],
+  ["INPUT:email", "value"],
+  ["INPUT:number", "value"],
+  ["INPUT:search", "value"],
+  ["INPUT:url", "value"],
+  ["INPUT:tel", "value"],
+  ["INPUT:checkbox", "checked"],
+  ["INPUT:radio", "checked"],
+]);
+function syncProperty(element, attrName, attrValue) {
+  const tagName = element.tagName;
+
+  const key = `${tagName}:${element.type ?? ""}`;
+  const propName = interactiveElementStateMap.get(key);
+
+  if (propName === attrName || interactiveElements.has(tagName)) {
+    element[attrName] = attrValue;
+  }
+}
 const BINDING_PATTERNS = {
   REACT_EVENT: /\s+(on[A-Z][a-zA-Z]*)\s*=\s*$/,
   ATTR: /\s+([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*$/,
@@ -219,32 +241,16 @@ const applyElementBindings = (elementBindings, container, effect) => {
 
 const watchAttr = (element, info, binding) => {
   const { name: attrName } = info;
-  const isInput = element.tagName === "INPUT";
-  const isSelect = element.tagName === "SELECT";
-  const isBooleanAttr = booleanAttrSet.has(attrName);
-  const isValueAttr = attrName === "value";
-
   return () => {
     const value = binding();
-
-    if (value == null || value === false) {
-      element.removeAttribute(attrName);
-
-      if ((isInput || isSelect) && isValueAttr) {
-        element.value = "";
-      }
-      return;
-    }
-
-    const attrValue = isBooleanAttr ? "" : String(value);
-    const shouldSetAttribute = isBooleanAttr ? value : true;
+    const shouldSetAttribute = value != null && value !== false;
 
     if (shouldSetAttribute) {
-      element.setAttribute(attrName, attrValue);
-
-      if ((isInput || isSelect) && isValueAttr) {
-        element.value = attrValue;
-      }
+      element.setAttribute(attrName, value);
+      syncProperty(element, attrName, value);
+    } else {
+      element.removeAttribute(attrName);
+      syncProperty(element, attrName, "");
     }
   };
 };
