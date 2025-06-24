@@ -16,7 +16,9 @@ function signal(initialState) {
 
     if (state !== newState) {
       state = newState;
-      dependencies.forEach((dep) => dep());
+      const deps = Array.from(dependencies);
+      dependencies.clear();
+      deps.forEach((dep) => dep());
     }
   };
 
@@ -27,19 +29,17 @@ function computed(callback) {
   const resultSignal = signal();
 
   const recompute = () => {
-    const value = callback();
-    resultSignal.set(value);
+    const prevDependency = currentDependency;
+    currentDependency = recompute;
+
+    try {
+      const value = callback();
+      resultSignal.set(value);
+    } finally {
+      currentDependency = prevDependency;
+    }
   };
-
-  const prevDependency = currentDependency;
-  currentDependency = recompute;
-
-  try {
-    recompute();
-  } finally {
-    currentDependency = prevDependency;
-  }
-
+  recompute();
   return resultSignal;
 }
 
