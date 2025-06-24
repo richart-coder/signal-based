@@ -1,12 +1,20 @@
-let currentDependency = null;
+let currentSubscriber = null;
+
+function cleanup(subscriber) {
+  for (const source of subscriber.sources) {
+    source.delete(subscriber);
+  }
+  subscriber.sources.clear();
+}
 
 function signal(initialState) {
   let state = initialState;
-  const dependencies = new Set();
+  const subscribers = new Set();
 
   const signalFn = () => {
-    if (currentDependency) {
-      dependencies.add(currentDependency);
+    if (currentSubscriber) {
+      subscribers.add(currentSubscriber);
+      currentSubscriber.sources.add(subscribers);
     }
     return state;
   };
@@ -16,9 +24,8 @@ function signal(initialState) {
 
     if (state !== newState) {
       state = newState;
-      const deps = Array.from(dependencies);
-      dependencies.clear();
-      deps.forEach((dep) => dep());
+      const subsToRun = [...subscribers];
+      subsToRun.forEach((sub) => sub());
     }
   };
 
@@ -29,31 +36,36 @@ function computed(callback) {
   const resultSignal = signal();
 
   const recompute = () => {
-    const prevDependency = currentDependency;
-    currentDependency = recompute;
+    cleanup(recompute);
+    const prevSubscriber = currentSubscriber;
+    currentSubscriber = recompute;
 
     try {
       const value = callback();
       resultSignal.set(value);
     } finally {
-      currentDependency = prevDependency;
+      currentSubscriber = prevSubscriber;
     }
   };
+  recompute.sources = new Set();
+
   recompute();
   return resultSignal;
 }
 
 function effect(effectFn) {
   const runEffect = () => {
-    const prevDependency = currentDependency;
-    currentDependency = runEffect;
+    cleanup(runEffect);
+    const prevSubscriber = currentSubscriber;
+    currentSubscriber = runEffect;
 
     try {
       effectFn();
     } finally {
-      currentDependency = prevDependency;
+      currentSubscriber = prevSubscriber;
     }
   };
+  runEffect.sources = new Set();
 
   runEffect();
   return runEffect;

@@ -211,7 +211,6 @@ const watchAttr = (element, info, binding) => {
   const { name: attrName } = info;
 
   return () => {
-    console.log("Attr");
     const value = binding();
     if (booleanAttrSet.has(attrName)) {
       element[attrName] = !!value;
@@ -328,7 +327,6 @@ const watchChildren = (elNode, binding, context) => {
   };
 
   return () => {
-    console.log("Children");
     const value = binding();
     if (isEqual(value, previousValue)) return;
 
