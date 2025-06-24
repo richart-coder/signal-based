@@ -127,12 +127,6 @@ const handleNewTodoInput = (e) => {
   newTodoText.set(e.target.value);
 };
 
-const handleNewTodoKeyPress = (e) => {
-  if (e.key === "Enter") {
-    handleAddTodo();
-  }
-};
-
 const handlePriorityChange = (e) => {
   selectedPriority.set(e.target.value);
 };
@@ -206,7 +200,6 @@ const context = {
   handleFilterActiveClick,
   handleFilterCompletedClick,
   handleNewTodoInput,
-  handleNewTodoKeyPress,
   handlePriorityChange,
 
   getPriorityText,

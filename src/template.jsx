@@ -32,7 +32,6 @@
           placeholder="輸入新的待辦事項..."
           value={newTodoText()}
           onInput={handleNewTodoInput}
-          onKeyPress={handleNewTodoKeyPress}
         />
         <select
           style="padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 8px;"

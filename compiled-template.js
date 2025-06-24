@@ -9,15 +9,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 27177,
-        "end": 27193
+        "start": 7091,
+        "end": 7107
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 27177,
-          "end": 27191
+          "start": 7091,
+          "end": 7105
         },
         "ctxt": 1,
         "value": "totalTodoCount",
@@ -36,15 +36,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 27228,
-        "end": 27245
+        "start": 7142,
+        "end": 7159
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 27228,
-          "end": 27243
+          "start": 7142,
+          "end": 7157
         },
         "ctxt": 1,
         "value": "activeTodoCount",
@@ -63,15 +63,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 27280,
-        "end": 27300
+        "start": 7194,
+        "end": 7214
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 27280,
-          "end": 27298
+          "start": 7194,
+          "end": 7212
         },
         "ctxt": 1,
         "value": "completedTodoCount",
@@ -90,15 +90,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 27536,
-        "end": 27556
+        "start": 7450,
+        "end": 7470
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 27536,
-          "end": 27554
+          "start": 7450,
+          "end": 7468
         },
         "ctxt": 1,
         "value": "progressPercentage",
@@ -117,22 +117,22 @@ export const compiledTemplate = [
     "expression": {
       "type": "TemplateLiteral",
       "span": {
-        "start": 27713,
-        "end": 27832
+        "start": 7627,
+        "end": 7746
       },
       "expressions": [
         {
           "type": "CallExpression",
           "span": {
-            "start": 27808,
-            "end": 27828
+            "start": 7722,
+            "end": 7742
           },
           "ctxt": 0,
           "callee": {
             "type": "Identifier",
             "span": {
-              "start": 27808,
-              "end": 27826
+              "start": 7722,
+              "end": 7740
             },
             "ctxt": 1,
             "value": "progressPercentage",
@@ -146,8 +146,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 27714,
-            "end": 27806
+            "start": 7628,
+            "end": 7720
           },
           "tail": false,
           "cooked": "background-color: #2563eb; height: 8px; border-radius: 9999px; transition: all 0.3s; width: ",
@@ -156,8 +156,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 27829,
-            "end": 27831
+            "start": 7743,
+            "end": 7745
           },
           "tail": true,
           "cooked": "%;",
@@ -175,15 +175,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 28262,
-        "end": 28275
+        "start": 8176,
+        "end": 8189
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 28262,
-          "end": 28273
+          "start": 8176,
+          "end": 8187
         },
         "ctxt": 1,
         "value": "newTodoText",
@@ -202,28 +202,11 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 28296,
-        "end": 28314
+        "start": 8210,
+        "end": 8228
       },
       "ctxt": 1,
       "value": "handleNewTodoInput",
-      "optional": false
-    }
-  },
-  {
-    "type": "static",
-    "content": " onKeyPress="
-  },
-  {
-    "type": "dynamic",
-    "expression": {
-      "type": "Identifier",
-      "span": {
-        "start": 28338,
-        "end": 28359
-      },
-      "ctxt": 1,
-      "value": "handleNewTodoKeyPress",
       "optional": false
     }
   },
@@ -236,15 +219,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 28489,
-        "end": 28507
+        "start": 8358,
+        "end": 8376
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 28489,
-          "end": 28505
+          "start": 8358,
+          "end": 8374
         },
         "ctxt": 1,
         "value": "selectedPriority",
@@ -263,8 +246,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 28529,
-        "end": 28549
+        "start": 8398,
+        "end": 8418
       },
       "ctxt": 1,
       "value": "handlePriorityChange",
@@ -280,8 +263,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 28904,
-        "end": 28917
+        "start": 8773,
+        "end": 8786
       },
       "ctxt": 1,
       "value": "handleAddTodo",
@@ -297,15 +280,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 28939,
-        "end": 28960
+        "start": 8808,
+        "end": 8829
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 28939,
-          "end": 28958
+          "start": 8808,
+          "end": 8827
         },
         "ctxt": 1,
         "value": "isAddButtonDisabled",
@@ -324,35 +307,35 @@ export const compiledTemplate = [
     "expression": {
       "type": "TemplateLiteral",
       "span": {
-        "start": 29217,
-        "end": 29464
+        "start": 9086,
+        "end": 9333
       },
       "expressions": [
         {
           "type": "ConditionalExpression",
           "span": {
-            "start": 29317,
-            "end": 29357
+            "start": 9186,
+            "end": 9226
           },
           "test": {
             "type": "BinaryExpression",
             "span": {
-              "start": 29317,
-              "end": 29335
+              "start": 9186,
+              "end": 9204
             },
             "operator": "===",
             "left": {
               "type": "CallExpression",
               "span": {
-                "start": 29317,
-                "end": 29325
+                "start": 9186,
+                "end": 9194
               },
               "ctxt": 0,
               "callee": {
                 "type": "Identifier",
                 "span": {
-                  "start": 29317,
-                  "end": 29323
+                  "start": 9186,
+                  "end": 9192
                 },
                 "ctxt": 1,
                 "value": "filter",
@@ -364,8 +347,8 @@ export const compiledTemplate = [
             "right": {
               "type": "StringLiteral",
               "span": {
-                "start": 29330,
-                "end": 29335
+                "start": 9199,
+                "end": 9204
               },
               "value": "all",
               "raw": "\"all\""
@@ -374,8 +357,8 @@ export const compiledTemplate = [
           "consequent": {
             "type": "StringLiteral",
             "span": {
-              "start": 29338,
-              "end": 29347
+              "start": 9207,
+              "end": 9216
             },
             "value": "#2563eb",
             "raw": "\"#2563eb\""
@@ -383,8 +366,8 @@ export const compiledTemplate = [
           "alternate": {
             "type": "StringLiteral",
             "span": {
-              "start": 29350,
-              "end": 29357
+              "start": 9219,
+              "end": 9226
             },
             "value": "white",
             "raw": "\"white\""
@@ -393,28 +376,28 @@ export const compiledTemplate = [
         {
           "type": "ConditionalExpression",
           "span": {
-            "start": 29393,
-            "end": 29433
+            "start": 9262,
+            "end": 9302
           },
           "test": {
             "type": "BinaryExpression",
             "span": {
-              "start": 29393,
-              "end": 29411
+              "start": 9262,
+              "end": 9280
             },
             "operator": "===",
             "left": {
               "type": "CallExpression",
               "span": {
-                "start": 29393,
-                "end": 29401
+                "start": 9262,
+                "end": 9270
               },
               "ctxt": 0,
               "callee": {
                 "type": "Identifier",
                 "span": {
-                  "start": 29393,
-                  "end": 29399
+                  "start": 9262,
+                  "end": 9268
                 },
                 "ctxt": 1,
                 "value": "filter",
@@ -426,8 +409,8 @@ export const compiledTemplate = [
             "right": {
               "type": "StringLiteral",
               "span": {
-                "start": 29406,
-                "end": 29411
+                "start": 9275,
+                "end": 9280
               },
               "value": "all",
               "raw": "\"all\""
@@ -436,8 +419,8 @@ export const compiledTemplate = [
           "consequent": {
             "type": "StringLiteral",
             "span": {
-              "start": 29414,
-              "end": 29421
+              "start": 9283,
+              "end": 9290
             },
             "value": "white",
             "raw": "\"white\""
@@ -445,8 +428,8 @@ export const compiledTemplate = [
           "alternate": {
             "type": "StringLiteral",
             "span": {
-              "start": 29424,
-              "end": 29433
+              "start": 9293,
+              "end": 9302
             },
             "value": "#374151",
             "raw": "\"#374151\""
@@ -457,8 +440,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 29218,
-            "end": 29302
+            "start": 9087,
+            "end": 9171
           },
           "tail": false,
           "cooked": "padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 8px; background-color: ",
@@ -467,8 +450,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 29369,
-            "end": 29378
+            "start": 9238,
+            "end": 9247
           },
           "tail": false,
           "cooked": "; color: ",
@@ -477,8 +460,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 29445,
-            "end": 29463
+            "start": 9314,
+            "end": 9332
           },
           "tail": true,
           "cooked": "; cursor: pointer;",
@@ -496,8 +479,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 29485,
-        "end": 29505
+        "start": 9354,
+        "end": 9374
       },
       "ctxt": 1,
       "value": "handleFilterAllClick",
@@ -513,35 +496,35 @@ export const compiledTemplate = [
     "expression": {
       "type": "TemplateLiteral",
       "span": {
-        "start": 29585,
-        "end": 29838
+        "start": 9454,
+        "end": 9707
       },
       "expressions": [
         {
           "type": "ConditionalExpression",
           "span": {
-            "start": 29685,
-            "end": 29728
+            "start": 9554,
+            "end": 9597
           },
           "test": {
             "type": "BinaryExpression",
             "span": {
-              "start": 29685,
-              "end": 29706
+              "start": 9554,
+              "end": 9575
             },
             "operator": "===",
             "left": {
               "type": "CallExpression",
               "span": {
-                "start": 29685,
-                "end": 29693
+                "start": 9554,
+                "end": 9562
               },
               "ctxt": 0,
               "callee": {
                 "type": "Identifier",
                 "span": {
-                  "start": 29685,
-                  "end": 29691
+                  "start": 9554,
+                  "end": 9560
                 },
                 "ctxt": 1,
                 "value": "filter",
@@ -553,8 +536,8 @@ export const compiledTemplate = [
             "right": {
               "type": "StringLiteral",
               "span": {
-                "start": 29698,
-                "end": 29706
+                "start": 9567,
+                "end": 9575
               },
               "value": "active",
               "raw": "\"active\""
@@ -563,8 +546,8 @@ export const compiledTemplate = [
           "consequent": {
             "type": "StringLiteral",
             "span": {
-              "start": 29709,
-              "end": 29718
+              "start": 9578,
+              "end": 9587
             },
             "value": "#2563eb",
             "raw": "\"#2563eb\""
@@ -572,8 +555,8 @@ export const compiledTemplate = [
           "alternate": {
             "type": "StringLiteral",
             "span": {
-              "start": 29721,
-              "end": 29728
+              "start": 9590,
+              "end": 9597
             },
             "value": "white",
             "raw": "\"white\""
@@ -582,28 +565,28 @@ export const compiledTemplate = [
         {
           "type": "ConditionalExpression",
           "span": {
-            "start": 29764,
-            "end": 29807
+            "start": 9633,
+            "end": 9676
           },
           "test": {
             "type": "BinaryExpression",
             "span": {
-              "start": 29764,
-              "end": 29785
+              "start": 9633,
+              "end": 9654
             },
             "operator": "===",
             "left": {
               "type": "CallExpression",
               "span": {
-                "start": 29764,
-                "end": 29772
+                "start": 9633,
+                "end": 9641
               },
               "ctxt": 0,
               "callee": {
                 "type": "Identifier",
                 "span": {
-                  "start": 29764,
-                  "end": 29770
+                  "start": 9633,
+                  "end": 9639
                 },
                 "ctxt": 1,
                 "value": "filter",
@@ -615,8 +598,8 @@ export const compiledTemplate = [
             "right": {
               "type": "StringLiteral",
               "span": {
-                "start": 29777,
-                "end": 29785
+                "start": 9646,
+                "end": 9654
               },
               "value": "active",
               "raw": "\"active\""
@@ -625,8 +608,8 @@ export const compiledTemplate = [
           "consequent": {
             "type": "StringLiteral",
             "span": {
-              "start": 29788,
-              "end": 29795
+              "start": 9657,
+              "end": 9664
             },
             "value": "white",
             "raw": "\"white\""
@@ -634,8 +617,8 @@ export const compiledTemplate = [
           "alternate": {
             "type": "StringLiteral",
             "span": {
-              "start": 29798,
-              "end": 29807
+              "start": 9667,
+              "end": 9676
             },
             "value": "#374151",
             "raw": "\"#374151\""
@@ -646,8 +629,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 29586,
-            "end": 29670
+            "start": 9455,
+            "end": 9539
           },
           "tail": false,
           "cooked": "padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 8px; background-color: ",
@@ -656,8 +639,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 29740,
-            "end": 29749
+            "start": 9609,
+            "end": 9618
           },
           "tail": false,
           "cooked": "; color: ",
@@ -666,8 +649,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 29819,
-            "end": 29837
+            "start": 9688,
+            "end": 9706
           },
           "tail": true,
           "cooked": "; cursor: pointer;",
@@ -685,8 +668,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 29859,
-        "end": 29882
+        "start": 9728,
+        "end": 9751
       },
       "ctxt": 1,
       "value": "handleFilterActiveClick",
@@ -702,15 +685,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 29915,
-        "end": 29932
+        "start": 9784,
+        "end": 9801
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 29915,
-          "end": 29930
+          "start": 9784,
+          "end": 9799
         },
         "ctxt": 1,
         "value": "activeTodoCount",
@@ -729,35 +712,35 @@ export const compiledTemplate = [
     "expression": {
       "type": "TemplateLiteral",
       "span": {
-        "start": 29985,
-        "end": 30244
+        "start": 9854,
+        "end": 10113
       },
       "expressions": [
         {
           "type": "ConditionalExpression",
           "span": {
-            "start": 30085,
-            "end": 30131
+            "start": 9954,
+            "end": 10000
           },
           "test": {
             "type": "BinaryExpression",
             "span": {
-              "start": 30085,
-              "end": 30109
+              "start": 9954,
+              "end": 9978
             },
             "operator": "===",
             "left": {
               "type": "CallExpression",
               "span": {
-                "start": 30085,
-                "end": 30093
+                "start": 9954,
+                "end": 9962
               },
               "ctxt": 0,
               "callee": {
                 "type": "Identifier",
                 "span": {
-                  "start": 30085,
-                  "end": 30091
+                  "start": 9954,
+                  "end": 9960
                 },
                 "ctxt": 1,
                 "value": "filter",
@@ -769,8 +752,8 @@ export const compiledTemplate = [
             "right": {
               "type": "StringLiteral",
               "span": {
-                "start": 30098,
-                "end": 30109
+                "start": 9967,
+                "end": 9978
               },
               "value": "completed",
               "raw": "\"completed\""
@@ -779,8 +762,8 @@ export const compiledTemplate = [
           "consequent": {
             "type": "StringLiteral",
             "span": {
-              "start": 30112,
-              "end": 30121
+              "start": 9981,
+              "end": 9990
             },
             "value": "#2563eb",
             "raw": "\"#2563eb\""
@@ -788,8 +771,8 @@ export const compiledTemplate = [
           "alternate": {
             "type": "StringLiteral",
             "span": {
-              "start": 30124,
-              "end": 30131
+              "start": 9993,
+              "end": 10000
             },
             "value": "white",
             "raw": "\"white\""
@@ -798,28 +781,28 @@ export const compiledTemplate = [
         {
           "type": "ConditionalExpression",
           "span": {
-            "start": 30167,
-            "end": 30213
+            "start": 10036,
+            "end": 10082
           },
           "test": {
             "type": "BinaryExpression",
             "span": {
-              "start": 30167,
-              "end": 30191
+              "start": 10036,
+              "end": 10060
             },
             "operator": "===",
             "left": {
               "type": "CallExpression",
               "span": {
-                "start": 30167,
-                "end": 30175
+                "start": 10036,
+                "end": 10044
               },
               "ctxt": 0,
               "callee": {
                 "type": "Identifier",
                 "span": {
-                  "start": 30167,
-                  "end": 30173
+                  "start": 10036,
+                  "end": 10042
                 },
                 "ctxt": 1,
                 "value": "filter",
@@ -831,8 +814,8 @@ export const compiledTemplate = [
             "right": {
               "type": "StringLiteral",
               "span": {
-                "start": 30180,
-                "end": 30191
+                "start": 10049,
+                "end": 10060
               },
               "value": "completed",
               "raw": "\"completed\""
@@ -841,8 +824,8 @@ export const compiledTemplate = [
           "consequent": {
             "type": "StringLiteral",
             "span": {
-              "start": 30194,
-              "end": 30201
+              "start": 10063,
+              "end": 10070
             },
             "value": "white",
             "raw": "\"white\""
@@ -850,8 +833,8 @@ export const compiledTemplate = [
           "alternate": {
             "type": "StringLiteral",
             "span": {
-              "start": 30204,
-              "end": 30213
+              "start": 10073,
+              "end": 10082
             },
             "value": "#374151",
             "raw": "\"#374151\""
@@ -862,8 +845,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 29986,
-            "end": 30070
+            "start": 9855,
+            "end": 9939
           },
           "tail": false,
           "cooked": "padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 8px; background-color: ",
@@ -872,8 +855,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 30143,
-            "end": 30152
+            "start": 10012,
+            "end": 10021
           },
           "tail": false,
           "cooked": "; color: ",
@@ -882,8 +865,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 30225,
-            "end": 30243
+            "start": 10094,
+            "end": 10112
           },
           "tail": true,
           "cooked": "; cursor: pointer;",
@@ -901,8 +884,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 30265,
-        "end": 30291
+        "start": 10134,
+        "end": 10160
       },
       "ctxt": 1,
       "value": "handleFilterCompletedClick",
@@ -918,15 +901,15 @@ export const compiledTemplate = [
     "expression": {
       "type": "CallExpression",
       "span": {
-        "start": 30324,
-        "end": 30344
+        "start": 10193,
+        "end": 10213
       },
       "ctxt": 0,
       "callee": {
         "type": "Identifier",
         "span": {
-          "start": 30324,
-          "end": 30342
+          "start": 10193,
+          "end": 10211
         },
         "ctxt": 1,
         "value": "completedTodoCount",
@@ -945,28 +928,28 @@ export const compiledTemplate = [
     "expression": {
       "type": "TemplateLiteral",
       "span": {
-        "start": 30407,
-        "end": 30591
+        "start": 10276,
+        "end": 10460
       },
       "expressions": [
         {
           "type": "ConditionalExpression",
           "span": {
-            "start": 30430,
-            "end": 30468
+            "start": 10299,
+            "end": 10337
           },
           "test": {
             "type": "CallExpression",
             "span": {
-              "start": 30430,
-              "end": 30449
+              "start": 10299,
+              "end": 10318
             },
             "ctxt": 0,
             "callee": {
               "type": "Identifier",
               "span": {
-                "start": 30430,
-                "end": 30447
+                "start": 10299,
+                "end": 10316
               },
               "ctxt": 1,
               "value": "hasCompletedTodos",
@@ -978,8 +961,8 @@ export const compiledTemplate = [
           "consequent": {
             "type": "StringLiteral",
             "span": {
-              "start": 30452,
-              "end": 30459
+              "start": 10321,
+              "end": 10328
             },
             "value": "block",
             "raw": "\"block\""
@@ -987,8 +970,8 @@ export const compiledTemplate = [
           "alternate": {
             "type": "StringLiteral",
             "span": {
-              "start": 30462,
-              "end": 30468
+              "start": 10331,
+              "end": 10337
             },
             "value": "none",
             "raw": "\"none\""
@@ -999,8 +982,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 30408,
-            "end": 30417
+            "start": 10277,
+            "end": 10286
           },
           "tail": false,
           "cooked": "display: ",
@@ -1009,8 +992,8 @@ export const compiledTemplate = [
         {
           "type": "TemplateElement",
           "span": {
-            "start": 30478,
-            "end": 30590
+            "start": 10347,
+            "end": 10459
           },
           "tail": true,
           "cooked": "; padding: 8px 16px; background-color: #dc2626; color: white; border-radius: 8px; border: none; cursor: pointer;",
@@ -1028,8 +1011,8 @@ export const compiledTemplate = [
     "expression": {
       "type": "Identifier",
       "span": {
-        "start": 30610,
-        "end": 30630
+        "start": 10479,
+        "end": 10499
       },
       "ctxt": 1,
       "value": "handleClearCompleted",
@@ -1045,21 +1028,21 @@ export const compiledTemplate = [
     "expression": {
       "type": "ConditionalExpression",
       "span": {
-        "start": 30766,
-        "end": 32775
+        "start": 10635,
+        "end": 12644
       },
       "test": {
         "type": "CallExpression",
         "span": {
-          "start": 30766,
-          "end": 30779
+          "start": 10635,
+          "end": 10648
         },
         "ctxt": 0,
         "callee": {
           "type": "Identifier",
           "span": {
-            "start": 30766,
-            "end": 30777
+            "start": 10635,
+            "end": 10646
           },
           "ctxt": 1,
           "value": "isEmptyList",
@@ -1071,51 +1054,51 @@ export const compiledTemplate = [
       "consequent": {
         "type": "ParenthesisExpression",
         "span": {
-          "start": 30782,
-          "end": 31015
+          "start": 10651,
+          "end": 10884
         },
         "expression": {
           "type": "JSXElement",
           "span": {
-            "start": 30792,
-            "end": 31007
+            "start": 10661,
+            "end": 10876
           },
           "opening": {
             "type": "JSXOpeningElement",
             "name": {
               "type": "Identifier",
               "span": {
-                "start": 30793,
-                "end": 30796
+                "start": 10662,
+                "end": 10665
               },
               "ctxt": 1,
               "value": "div",
               "optional": false
             },
             "span": {
-              "start": 30792,
-              "end": 30856
+              "start": 10661,
+              "end": 10725
             },
             "attributes": [
               {
                 "type": "JSXAttribute",
                 "span": {
-                  "start": 30797,
-                  "end": 30855
+                  "start": 10666,
+                  "end": 10724
                 },
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 30797,
-                    "end": 30802
+                    "start": 10666,
+                    "end": 10671
                   },
                   "value": "style"
                 },
                 "value": {
                   "type": "StringLiteral",
                   "span": {
-                    "start": 30803,
-                    "end": 30855
+                    "start": 10672,
+                    "end": 10724
                   },
                   "value": "text-align: center; padding: 32px; color: #6b7280;",
                   "raw": "\"text-align: center; padding: 32px; color: #6b7280;\""
@@ -1129,8 +1112,8 @@ export const compiledTemplate = [
             {
               "type": "JSXText",
               "span": {
-                "start": 30856,
-                "end": 30867
+                "start": 10725,
+                "end": 10736
               },
               "value": "\n          ",
               "raw": "\n          "
@@ -1138,45 +1121,45 @@ export const compiledTemplate = [
             {
               "type": "JSXElement",
               "span": {
-                "start": 30867,
-                "end": 30913
+                "start": 10736,
+                "end": 10782
               },
               "opening": {
                 "type": "JSXOpeningElement",
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 30868,
-                    "end": 30869
+                    "start": 10737,
+                    "end": 10738
                   },
                   "ctxt": 1,
                   "value": "p",
                   "optional": false
                 },
                 "span": {
-                  "start": 30867,
-                  "end": 30895
+                  "start": 10736,
+                  "end": 10764
                 },
                 "attributes": [
                   {
                     "type": "JSXAttribute",
                     "span": {
-                      "start": 30870,
-                      "end": 30894
+                      "start": 10739,
+                      "end": 10763
                     },
                     "name": {
                       "type": "Identifier",
                       "span": {
-                        "start": 30870,
-                        "end": 30875
+                        "start": 10739,
+                        "end": 10744
                       },
                       "value": "style"
                     },
                     "value": {
                       "type": "StringLiteral",
                       "span": {
-                        "start": 30876,
-                        "end": 30894
+                        "start": 10745,
+                        "end": 10763
                       },
                       "value": "font-size: 18px;",
                       "raw": "\"font-size: 18px;\""
@@ -1190,8 +1173,8 @@ export const compiledTemplate = [
                 {
                   "type": "JSXText",
                   "span": {
-                    "start": 30895,
-                    "end": 30901
+                    "start": 10764,
+                    "end": 10770
                   },
                   "value": "沒有",
                   "raw": "沒有"
@@ -1199,22 +1182,22 @@ export const compiledTemplate = [
                 {
                   "type": "JSXExpressionContainer",
                   "span": {
-                    "start": 30901,
-                    "end": 30903
+                    "start": 10770,
+                    "end": 10772
                   },
                   "expression": {
                     "type": "JSXEmptyExpression",
                     "span": {
-                      "start": 30902,
-                      "end": 30902
+                      "start": 10771,
+                      "end": 10771
                     }
                   }
                 },
                 {
                   "type": "JSXText",
                   "span": {
-                    "start": 30903,
-                    "end": 30909
+                    "start": 10772,
+                    "end": 10778
                   },
                   "value": "事項",
                   "raw": "事項"
@@ -1223,14 +1206,14 @@ export const compiledTemplate = [
               "closing": {
                 "type": "JSXClosingElement",
                 "span": {
-                  "start": 30909,
-                  "end": 30913
+                  "start": 10778,
+                  "end": 10782
                 },
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 30911,
-                    "end": 30912
+                    "start": 10780,
+                    "end": 10781
                   },
                   "ctxt": 1,
                   "value": "p",
@@ -1241,8 +1224,8 @@ export const compiledTemplate = [
             {
               "type": "JSXText",
               "span": {
-                "start": 30913,
-                "end": 30924
+                "start": 10782,
+                "end": 10793
               },
               "value": "\n          ",
               "raw": "\n          "
@@ -1250,45 +1233,45 @@ export const compiledTemplate = [
             {
               "type": "JSXElement",
               "span": {
-                "start": 30924,
-                "end": 30992
+                "start": 10793,
+                "end": 10861
               },
               "opening": {
                 "type": "JSXOpeningElement",
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 30925,
-                    "end": 30926
+                    "start": 10794,
+                    "end": 10795
                   },
                   "ctxt": 1,
                   "value": "p",
                   "optional": false
                 },
                 "span": {
-                  "start": 30924,
-                  "end": 30952
+                  "start": 10793,
+                  "end": 10821
                 },
                 "attributes": [
                   {
                     "type": "JSXAttribute",
                     "span": {
-                      "start": 30927,
-                      "end": 30951
+                      "start": 10796,
+                      "end": 10820
                     },
                     "name": {
                       "type": "Identifier",
                       "span": {
-                        "start": 30927,
-                        "end": 30932
+                        "start": 10796,
+                        "end": 10801
                       },
                       "value": "style"
                     },
                     "value": {
                       "type": "StringLiteral",
                       "span": {
-                        "start": 30933,
-                        "end": 30951
+                        "start": 10802,
+                        "end": 10820
                       },
                       "value": "font-size: 14px;",
                       "raw": "\"font-size: 14px;\""
@@ -1302,8 +1285,8 @@ export const compiledTemplate = [
                 {
                   "type": "JSXText",
                   "span": {
-                    "start": 30952,
-                    "end": 30988
+                    "start": 10821,
+                    "end": 10857
                   },
                   "value": "新增一個待辦事項開始吧！",
                   "raw": "新增一個待辦事項開始吧！"
@@ -1312,14 +1295,14 @@ export const compiledTemplate = [
               "closing": {
                 "type": "JSXClosingElement",
                 "span": {
-                  "start": 30988,
-                  "end": 30992
+                  "start": 10857,
+                  "end": 10861
                 },
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 30990,
-                    "end": 30991
+                    "start": 10859,
+                    "end": 10860
                   },
                   "ctxt": 1,
                   "value": "p",
@@ -1330,8 +1313,8 @@ export const compiledTemplate = [
             {
               "type": "JSXText",
               "span": {
-                "start": 30992,
-                "end": 31001
+                "start": 10861,
+                "end": 10870
               },
               "value": "\n        ",
               "raw": "\n        "
@@ -1340,14 +1323,14 @@ export const compiledTemplate = [
           "closing": {
             "type": "JSXClosingElement",
             "span": {
-              "start": 31001,
-              "end": 31007
+              "start": 10870,
+              "end": 10876
             },
             "name": {
               "type": "Identifier",
               "span": {
-                "start": 31003,
-                "end": 31006
+                "start": 10872,
+                "end": 10875
               },
               "ctxt": 1,
               "value": "div",
@@ -1359,34 +1342,34 @@ export const compiledTemplate = [
       "alternate": {
         "type": "ParenthesisExpression",
         "span": {
-          "start": 31018,
-          "end": 32775
+          "start": 10887,
+          "end": 12644
         },
         "expression": {
           "type": "CallExpression",
           "span": {
-            "start": 31028,
-            "end": 32767
+            "start": 10897,
+            "end": 12636
           },
           "ctxt": 0,
           "callee": {
             "type": "MemberExpression",
             "span": {
-              "start": 31028,
-              "end": 31047
+              "start": 10897,
+              "end": 10916
             },
             "object": {
               "type": "CallExpression",
               "span": {
-                "start": 31028,
-                "end": 31043
+                "start": 10897,
+                "end": 10912
               },
               "ctxt": 0,
               "callee": {
                 "type": "Identifier",
                 "span": {
-                  "start": 31028,
-                  "end": 31041
+                  "start": 10897,
+                  "end": 10910
                 },
                 "ctxt": 1,
                 "value": "filteredTodos",
@@ -1398,8 +1381,8 @@ export const compiledTemplate = [
             "property": {
               "type": "Identifier",
               "span": {
-                "start": 31044,
-                "end": 31047
+                "start": 10913,
+                "end": 10916
               },
               "value": "map"
             }
@@ -1410,16 +1393,16 @@ export const compiledTemplate = [
               "expression": {
                 "type": "ArrowFunctionExpression",
                 "span": {
-                  "start": 31048,
-                  "end": 32766
+                  "start": 10917,
+                  "end": 12635
                 },
                 "ctxt": 0,
                 "params": [
                   {
                     "type": "Identifier",
                     "span": {
-                      "start": 31049,
-                      "end": 31053
+                      "start": 10918,
+                      "end": 10922
                     },
                     "ctxt": 3,
                     "value": "todo",
@@ -1430,63 +1413,63 @@ export const compiledTemplate = [
                 "body": {
                   "type": "ParenthesisExpression",
                   "span": {
-                    "start": 31058,
-                    "end": 32766
+                    "start": 10927,
+                    "end": 12635
                   },
                   "expression": {
                     "type": "JSXElement",
                     "span": {
-                      "start": 31070,
-                      "end": 32756
+                      "start": 10939,
+                      "end": 12625
                     },
                     "opening": {
                       "type": "JSXOpeningElement",
                       "name": {
                         "type": "Identifier",
                         "span": {
-                          "start": 31071,
-                          "end": 31074
+                          "start": 10940,
+                          "end": 10943
                         },
                         "ctxt": 1,
                         "value": "div",
                         "optional": false
                       },
                       "span": {
-                        "start": 31070,
-                        "end": 31321
+                        "start": 10939,
+                        "end": 11190
                       },
                       "attributes": [
                         {
                           "type": "JSXAttribute",
                           "span": {
-                            "start": 31087,
-                            "end": 31100
+                            "start": 10956,
+                            "end": 10969
                           },
                           "name": {
                             "type": "Identifier",
                             "span": {
-                              "start": 31087,
-                              "end": 31090
+                              "start": 10956,
+                              "end": 10959
                             },
                             "value": "key"
                           },
                           "value": {
                             "type": "JSXExpressionContainer",
                             "span": {
-                              "start": 31091,
-                              "end": 31100
+                              "start": 10960,
+                              "end": 10969
                             },
                             "expression": {
                               "type": "MemberExpression",
                               "span": {
-                                "start": 31092,
-                                "end": 31099
+                                "start": 10961,
+                                "end": 10968
                               },
                               "object": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 31092,
-                                  "end": 31096
+                                  "start": 10961,
+                                  "end": 10965
                                 },
                                 "ctxt": 3,
                                 "value": "todo",
@@ -1495,8 +1478,8 @@ export const compiledTemplate = [
                               "property": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 31097,
-                                  "end": 31099
+                                  "start": 10966,
+                                  "end": 10968
                                 },
                                 "value": "id"
                               }
@@ -1506,47 +1489,47 @@ export const compiledTemplate = [
                         {
                           "type": "JSXAttribute",
                           "span": {
-                            "start": 31113,
-                            "end": 31309
+                            "start": 10982,
+                            "end": 11178
                           },
                           "name": {
                             "type": "Identifier",
                             "span": {
-                              "start": 31113,
-                              "end": 31118
+                              "start": 10982,
+                              "end": 10987
                             },
                             "value": "style"
                           },
                           "value": {
                             "type": "JSXExpressionContainer",
                             "span": {
-                              "start": 31119,
-                              "end": 31309
+                              "start": 10988,
+                              "end": 11178
                             },
                             "expression": {
                               "type": "TemplateLiteral",
                               "span": {
-                                "start": 31120,
-                                "end": 31308
+                                "start": 10989,
+                                "end": 11177
                               },
                               "expressions": [
                                 {
                                   "type": "ConditionalExpression",
                                   "span": {
-                                    "start": 31218,
-                                    "end": 31254
+                                    "start": 11087,
+                                    "end": 11123
                                   },
                                   "test": {
                                     "type": "MemberExpression",
                                     "span": {
-                                      "start": 31218,
-                                      "end": 31232
+                                      "start": 11087,
+                                      "end": 11101
                                     },
                                     "object": {
                                       "type": "Identifier",
                                       "span": {
-                                        "start": 31218,
-                                        "end": 31222
+                                        "start": 11087,
+                                        "end": 11091
                                       },
                                       "ctxt": 3,
                                       "value": "todo",
@@ -1555,8 +1538,8 @@ export const compiledTemplate = [
                                     "property": {
                                       "type": "Identifier",
                                       "span": {
-                                        "start": 31223,
-                                        "end": 31232
+                                        "start": 11092,
+                                        "end": 11101
                                       },
                                       "value": "completed"
                                     }
@@ -1564,8 +1547,8 @@ export const compiledTemplate = [
                                   "consequent": {
                                     "type": "StringLiteral",
                                     "span": {
-                                      "start": 31235,
-                                      "end": 31244
+                                      "start": 11104,
+                                      "end": 11113
                                     },
                                     "value": "#f9fafb",
                                     "raw": "\"#f9fafb\""
@@ -1573,8 +1556,8 @@ export const compiledTemplate = [
                                   "alternate": {
                                     "type": "StringLiteral",
                                     "span": {
-                                      "start": 31247,
-                                      "end": 31254
+                                      "start": 11116,
+                                      "end": 11123
                                     },
                                     "value": "white",
                                     "raw": "\"white\""
@@ -1583,20 +1566,20 @@ export const compiledTemplate = [
                                 {
                                   "type": "ConditionalExpression",
                                   "span": {
-                                    "start": 31281,
-                                    "end": 31305
+                                    "start": 11150,
+                                    "end": 11174
                                   },
                                   "test": {
                                     "type": "MemberExpression",
                                     "span": {
-                                      "start": 31281,
-                                      "end": 31295
+                                      "start": 11150,
+                                      "end": 11164
                                     },
                                     "object": {
                                       "type": "Identifier",
                                       "span": {
-                                        "start": 31281,
-                                        "end": 31285
+                                        "start": 11150,
+                                        "end": 11154
                                       },
                                       "ctxt": 3,
                                       "value": "todo",
@@ -1605,8 +1588,8 @@ export const compiledTemplate = [
                                     "property": {
                                       "type": "Identifier",
                                       "span": {
-                                        "start": 31286,
-                                        "end": 31295
+                                        "start": 11155,
+                                        "end": 11164
                                       },
                                       "value": "completed"
                                     }
@@ -1614,8 +1597,8 @@ export const compiledTemplate = [
                                   "consequent": {
                                     "type": "NumericLiteral",
                                     "span": {
-                                      "start": 31298,
-                                      "end": 31301
+                                      "start": 11167,
+                                      "end": 11170
                                     },
                                     "value": 0.7,
                                     "raw": "0.7"
@@ -1623,8 +1606,8 @@ export const compiledTemplate = [
                                   "alternate": {
                                     "type": "NumericLiteral",
                                     "span": {
-                                      "start": 31304,
-                                      "end": 31305
+                                      "start": 11173,
+                                      "end": 11174
                                     },
                                     "value": 1,
                                     "raw": "1"
@@ -1635,8 +1618,8 @@ export const compiledTemplate = [
                                 {
                                   "type": "TemplateElement",
                                   "span": {
-                                    "start": 31121,
-                                    "end": 31201
+                                    "start": 10990,
+                                    "end": 11070
                                   },
                                   "tail": false,
                                   "cooked": "padding: 16px; border: 1px solid #d1d5db; border-radius: 8px; background-color: ",
@@ -1645,8 +1628,8 @@ export const compiledTemplate = [
                                 {
                                   "type": "TemplateElement",
                                   "span": {
-                                    "start": 31268,
-                                    "end": 31279
+                                    "start": 11137,
+                                    "end": 11148
                                   },
                                   "tail": false,
                                   "cooked": "; opacity: ",
@@ -1655,8 +1638,8 @@ export const compiledTemplate = [
                                 {
                                   "type": "TemplateElement",
                                   "span": {
-                                    "start": 31306,
-                                    "end": 31307
+                                    "start": 11175,
+                                    "end": 11176
                                   },
                                   "tail": true,
                                   "cooked": ";",
@@ -1674,8 +1657,8 @@ export const compiledTemplate = [
                       {
                         "type": "JSXText",
                         "span": {
-                          "start": 31321,
-                          "end": 31334
+                          "start": 11190,
+                          "end": 11203
                         },
                         "value": "\n            ",
                         "raw": "\n            "
@@ -1683,45 +1666,45 @@ export const compiledTemplate = [
                       {
                         "type": "JSXElement",
                         "span": {
-                          "start": 31334,
-                          "end": 32739
+                          "start": 11203,
+                          "end": 12608
                         },
                         "opening": {
                           "type": "JSXOpeningElement",
                           "name": {
                             "type": "Identifier",
                             "span": {
-                              "start": 31335,
-                              "end": 31338
+                              "start": 11204,
+                              "end": 11207
                             },
                             "ctxt": 1,
                             "value": "div",
                             "optional": false
                           },
                           "span": {
-                            "start": 31334,
-                            "end": 31394
+                            "start": 11203,
+                            "end": 11263
                           },
                           "attributes": [
                             {
                               "type": "JSXAttribute",
                               "span": {
-                                "start": 31339,
-                                "end": 31393
+                                "start": 11208,
+                                "end": 11262
                               },
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 31339,
-                                  "end": 31344
+                                  "start": 11208,
+                                  "end": 11213
                                 },
                                 "value": "style"
                               },
                               "value": {
                                 "type": "StringLiteral",
                                 "span": {
-                                  "start": 31345,
-                                  "end": 31393
+                                  "start": 11214,
+                                  "end": 11262
                                 },
                                 "value": "display: flex; align-items: center; gap: 12px;",
                                 "raw": "\"display: flex; align-items: center; gap: 12px;\""
@@ -1735,8 +1718,8 @@ export const compiledTemplate = [
                           {
                             "type": "JSXText",
                             "span": {
-                              "start": 31394,
-                              "end": 31409
+                              "start": 11263,
+                              "end": 11278
                             },
                             "value": "\n              ",
                             "raw": "\n              "
@@ -1744,45 +1727,45 @@ export const compiledTemplate = [
                           {
                             "type": "JSXElement",
                             "span": {
-                              "start": 31409,
-                              "end": 31565
+                              "start": 11278,
+                              "end": 11434
                             },
                             "opening": {
                               "type": "JSXOpeningElement",
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 31410,
-                                  "end": 31415
+                                  "start": 11279,
+                                  "end": 11284
                                 },
                                 "ctxt": 1,
                                 "value": "input",
                                 "optional": false
                               },
                               "span": {
-                                "start": 31409,
-                                "end": 31565
+                                "start": 11278,
+                                "end": 11434
                               },
                               "attributes": [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 31432,
-                                    "end": 31447
+                                    "start": 11301,
+                                    "end": 11316
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 31432,
-                                      "end": 31436
+                                      "start": 11301,
+                                      "end": 11305
                                     },
                                     "value": "type"
                                   },
                                   "value": {
                                     "type": "StringLiteral",
                                     "span": {
-                                      "start": 31437,
-                                      "end": 31447
+                                      "start": 11306,
+                                      "end": 11316
                                     },
                                     "value": "checkbox",
                                     "raw": "\"checkbox\""
@@ -1791,34 +1774,34 @@ export const compiledTemplate = [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 31464,
-                                    "end": 31488
+                                    "start": 11333,
+                                    "end": 11357
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 31464,
-                                      "end": 31471
+                                      "start": 11333,
+                                      "end": 11340
                                     },
                                     "value": "checked"
                                   },
                                   "value": {
                                     "type": "JSXExpressionContainer",
                                     "span": {
-                                      "start": 31472,
-                                      "end": 31488
+                                      "start": 11341,
+                                      "end": 11357
                                     },
                                     "expression": {
                                       "type": "MemberExpression",
                                       "span": {
-                                        "start": 31473,
-                                        "end": 31487
+                                        "start": 11342,
+                                        "end": 11356
                                       },
                                       "object": {
                                         "type": "Identifier",
                                         "span": {
-                                          "start": 31473,
-                                          "end": 31477
+                                          "start": 11342,
+                                          "end": 11346
                                         },
                                         "ctxt": 3,
                                         "value": "todo",
@@ -1827,8 +1810,8 @@ export const compiledTemplate = [
                                       "property": {
                                         "type": "Identifier",
                                         "span": {
-                                          "start": 31478,
-                                          "end": 31487
+                                          "start": 11347,
+                                          "end": 11356
                                         },
                                         "value": "completed"
                                       }
@@ -1838,43 +1821,43 @@ export const compiledTemplate = [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 31505,
-                                    "end": 31548
+                                    "start": 11374,
+                                    "end": 11417
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 31505,
-                                      "end": 31513
+                                      "start": 11374,
+                                      "end": 11382
                                     },
                                     "value": "onChange"
                                   },
                                   "value": {
                                     "type": "JSXExpressionContainer",
                                     "span": {
-                                      "start": 31514,
-                                      "end": 31548
+                                      "start": 11383,
+                                      "end": 11417
                                     },
                                     "expression": {
                                       "type": "ArrowFunctionExpression",
                                       "span": {
-                                        "start": 31515,
-                                        "end": 31547
+                                        "start": 11384,
+                                        "end": 11416
                                       },
                                       "ctxt": 0,
                                       "params": [],
                                       "body": {
                                         "type": "CallExpression",
                                         "span": {
-                                          "start": 31521,
-                                          "end": 31547
+                                          "start": 11390,
+                                          "end": 11416
                                         },
                                         "ctxt": 0,
                                         "callee": {
                                           "type": "Identifier",
                                           "span": {
-                                            "start": 31521,
-                                            "end": 31538
+                                            "start": 11390,
+                                            "end": 11407
                                           },
                                           "ctxt": 1,
                                           "value": "handleToggleClick",
@@ -1886,14 +1869,14 @@ export const compiledTemplate = [
                                             "expression": {
                                               "type": "MemberExpression",
                                               "span": {
-                                                "start": 31539,
-                                                "end": 31546
+                                                "start": 11408,
+                                                "end": 11415
                                               },
                                               "object": {
                                                 "type": "Identifier",
                                                 "span": {
-                                                  "start": 31539,
-                                                  "end": 31543
+                                                  "start": 11408,
+                                                  "end": 11412
                                                 },
                                                 "ctxt": 3,
                                                 "value": "todo",
@@ -1902,8 +1885,8 @@ export const compiledTemplate = [
                                               "property": {
                                                 "type": "Identifier",
                                                 "span": {
-                                                  "start": 31544,
-                                                  "end": 31546
+                                                  "start": 11413,
+                                                  "end": 11415
                                                 },
                                                 "value": "id"
                                               }
@@ -1929,8 +1912,8 @@ export const compiledTemplate = [
                           {
                             "type": "JSXText",
                             "span": {
-                              "start": 31565,
-                              "end": 31580
+                              "start": 11434,
+                              "end": 11449
                             },
                             "value": "\n              ",
                             "raw": "\n              "
@@ -1938,70 +1921,70 @@ export const compiledTemplate = [
                           {
                             "type": "JSXElement",
                             "span": {
-                              "start": 31580,
-                              "end": 31834
+                              "start": 11449,
+                              "end": 11703
                             },
                             "opening": {
                               "type": "JSXOpeningElement",
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 31581,
-                                  "end": 31585
+                                  "start": 11450,
+                                  "end": 11454
                                 },
                                 "ctxt": 1,
                                 "value": "span",
                                 "optional": false
                               },
                               "span": {
-                                "start": 31580,
-                                "end": 31784
+                                "start": 11449,
+                                "end": 11653
                               },
                               "attributes": [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 31602,
-                                    "end": 31768
+                                    "start": 11471,
+                                    "end": 11637
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 31602,
-                                      "end": 31607
+                                      "start": 11471,
+                                      "end": 11476
                                     },
                                     "value": "style"
                                   },
                                   "value": {
                                     "type": "JSXExpressionContainer",
                                     "span": {
-                                      "start": 31608,
-                                      "end": 31768
+                                      "start": 11477,
+                                      "end": 11637
                                     },
                                     "expression": {
                                       "type": "TemplateLiteral",
                                       "span": {
-                                        "start": 31609,
-                                        "end": 31767
+                                        "start": 11478,
+                                        "end": 11636
                                       },
                                       "expressions": [
                                         {
                                           "type": "ConditionalExpression",
                                           "span": {
-                                            "start": 31657,
-                                            "end": 31697
+                                            "start": 11526,
+                                            "end": 11566
                                           },
                                           "test": {
                                             "type": "MemberExpression",
                                             "span": {
-                                              "start": 31657,
-                                              "end": 31671
+                                              "start": 11526,
+                                              "end": 11540
                                             },
                                             "object": {
                                               "type": "Identifier",
                                               "span": {
-                                                "start": 31657,
-                                                "end": 31661
+                                                "start": 11526,
+                                                "end": 11530
                                               },
                                               "ctxt": 3,
                                               "value": "todo",
@@ -2010,8 +1993,8 @@ export const compiledTemplate = [
                                             "property": {
                                               "type": "Identifier",
                                               "span": {
-                                                "start": 31662,
-                                                "end": 31671
+                                                "start": 11531,
+                                                "end": 11540
                                               },
                                               "value": "completed"
                                             }
@@ -2019,8 +2002,8 @@ export const compiledTemplate = [
                                           "consequent": {
                                             "type": "StringLiteral",
                                             "span": {
-                                              "start": 31674,
-                                              "end": 31688
+                                              "start": 11543,
+                                              "end": 11557
                                             },
                                             "value": "line-through",
                                             "raw": "\"line-through\""
@@ -2028,8 +2011,8 @@ export const compiledTemplate = [
                                           "alternate": {
                                             "type": "StringLiteral",
                                             "span": {
-                                              "start": 31691,
-                                              "end": 31697
+                                              "start": 11560,
+                                              "end": 11566
                                             },
                                             "value": "none",
                                             "raw": "\"none\""
@@ -2038,20 +2021,20 @@ export const compiledTemplate = [
                                         {
                                           "type": "ConditionalExpression",
                                           "span": {
-                                            "start": 31726,
-                                            "end": 31764
+                                            "start": 11595,
+                                            "end": 11633
                                           },
                                           "test": {
                                             "type": "MemberExpression",
                                             "span": {
-                                              "start": 31726,
-                                              "end": 31740
+                                              "start": 11595,
+                                              "end": 11609
                                             },
                                             "object": {
                                               "type": "Identifier",
                                               "span": {
-                                                "start": 31726,
-                                                "end": 31730
+                                                "start": 11595,
+                                                "end": 11599
                                               },
                                               "ctxt": 3,
                                               "value": "todo",
@@ -2060,8 +2043,8 @@ export const compiledTemplate = [
                                             "property": {
                                               "type": "Identifier",
                                               "span": {
-                                                "start": 31731,
-                                                "end": 31740
+                                                "start": 11600,
+                                                "end": 11609
                                               },
                                               "value": "completed"
                                             }
@@ -2069,8 +2052,8 @@ export const compiledTemplate = [
                                           "consequent": {
                                             "type": "StringLiteral",
                                             "span": {
-                                              "start": 31743,
-                                              "end": 31752
+                                              "start": 11612,
+                                              "end": 11621
                                             },
                                             "value": "#6b7280",
                                             "raw": "\"#6b7280\""
@@ -2078,8 +2061,8 @@ export const compiledTemplate = [
                                           "alternate": {
                                             "type": "StringLiteral",
                                             "span": {
-                                              "start": 31755,
-                                              "end": 31764
+                                              "start": 11624,
+                                              "end": 11633
                                             },
                                             "value": "#374151",
                                             "raw": "\"#374151\""
@@ -2090,8 +2073,8 @@ export const compiledTemplate = [
                                         {
                                           "type": "TemplateElement",
                                           "span": {
-                                            "start": 31610,
-                                            "end": 31636
+                                            "start": 11479,
+                                            "end": 11505
                                           },
                                           "tail": false,
                                           "cooked": "flex: 1; text-decoration: ",
@@ -2100,8 +2083,8 @@ export const compiledTemplate = [
                                         {
                                           "type": "TemplateElement",
                                           "span": {
-                                            "start": 31715,
-                                            "end": 31724
+                                            "start": 11584,
+                                            "end": 11593
                                           },
                                           "tail": false,
                                           "cooked": "; color: ",
@@ -2110,8 +2093,8 @@ export const compiledTemplate = [
                                         {
                                           "type": "TemplateElement",
                                           "span": {
-                                            "start": 31765,
-                                            "end": 31766
+                                            "start": 11634,
+                                            "end": 11635
                                           },
                                           "tail": true,
                                           "cooked": ";",
@@ -2129,8 +2112,8 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXText",
                                 "span": {
-                                  "start": 31784,
-                                  "end": 31801
+                                  "start": 11653,
+                                  "end": 11670
                                 },
                                 "value": "\n                ",
                                 "raw": "\n                "
@@ -2138,20 +2121,20 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXExpressionContainer",
                                 "span": {
-                                  "start": 31801,
-                                  "end": 31812
+                                  "start": 11670,
+                                  "end": 11681
                                 },
                                 "expression": {
                                   "type": "MemberExpression",
                                   "span": {
-                                    "start": 31802,
-                                    "end": 31811
+                                    "start": 11671,
+                                    "end": 11680
                                   },
                                   "object": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 31802,
-                                      "end": 31806
+                                      "start": 11671,
+                                      "end": 11675
                                     },
                                     "ctxt": 3,
                                     "value": "todo",
@@ -2160,8 +2143,8 @@ export const compiledTemplate = [
                                   "property": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 31807,
-                                      "end": 31811
+                                      "start": 11676,
+                                      "end": 11680
                                     },
                                     "value": "text"
                                   }
@@ -2170,8 +2153,8 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXText",
                                 "span": {
-                                  "start": 31812,
-                                  "end": 31827
+                                  "start": 11681,
+                                  "end": 11696
                                 },
                                 "value": "\n              ",
                                 "raw": "\n              "
@@ -2180,14 +2163,14 @@ export const compiledTemplate = [
                             "closing": {
                               "type": "JSXClosingElement",
                               "span": {
-                                "start": 31827,
-                                "end": 31834
+                                "start": 11696,
+                                "end": 11703
                               },
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 31829,
-                                  "end": 31833
+                                  "start": 11698,
+                                  "end": 11702
                                 },
                                 "ctxt": 1,
                                 "value": "span",
@@ -2198,8 +2181,8 @@ export const compiledTemplate = [
                           {
                             "type": "JSXText",
                             "span": {
-                              "start": 31834,
-                              "end": 31849
+                              "start": 11703,
+                              "end": 11718
                             },
                             "value": "\n              ",
                             "raw": "\n              "
@@ -2207,65 +2190,65 @@ export const compiledTemplate = [
                           {
                             "type": "JSXElement",
                             "span": {
-                              "start": 31849,
-                              "end": 32127
+                              "start": 11718,
+                              "end": 11996
                             },
                             "opening": {
                               "type": "JSXOpeningElement",
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 31850,
-                                  "end": 31854
+                                  "start": 11719,
+                                  "end": 11723
                                 },
                                 "ctxt": 1,
                                 "value": "span",
                                 "optional": false
                               },
                               "span": {
-                                "start": 31849,
-                                "end": 32056
+                                "start": 11718,
+                                "end": 11925
                               },
                               "attributes": [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 31871,
-                                    "end": 32040
+                                    "start": 11740,
+                                    "end": 11909
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 31871,
-                                      "end": 31876
+                                      "start": 11740,
+                                      "end": 11745
                                     },
                                     "value": "style"
                                   },
                                   "value": {
                                     "type": "JSXExpressionContainer",
                                     "span": {
-                                      "start": 31877,
-                                      "end": 32040
+                                      "start": 11746,
+                                      "end": 11909
                                     },
                                     "expression": {
                                       "type": "TemplateLiteral",
                                       "span": {
-                                        "start": 31878,
-                                        "end": 32039
+                                        "start": 11747,
+                                        "end": 11908
                                       },
                                       "expressions": [
                                         {
                                           "type": "CallExpression",
                                           "span": {
-                                            "start": 31955,
-                                            "end": 32022
+                                            "start": 11824,
+                                            "end": 11891
                                           },
                                           "ctxt": 0,
                                           "callee": {
                                             "type": "Identifier",
                                             "span": {
-                                              "start": 31955,
-                                              "end": 31971
+                                              "start": 11824,
+                                              "end": 11840
                                             },
                                             "ctxt": 1,
                                             "value": "getPriorityColor",
@@ -2277,14 +2260,14 @@ export const compiledTemplate = [
                                               "expression": {
                                                 "type": "MemberExpression",
                                                 "span": {
-                                                  "start": 31991,
-                                                  "end": 32004
+                                                  "start": 11860,
+                                                  "end": 11873
                                                 },
                                                 "object": {
                                                   "type": "Identifier",
                                                   "span": {
-                                                    "start": 31991,
-                                                    "end": 31995
+                                                    "start": 11860,
+                                                    "end": 11864
                                                   },
                                                   "ctxt": 3,
                                                   "value": "todo",
@@ -2293,8 +2276,8 @@ export const compiledTemplate = [
                                                 "property": {
                                                   "type": "Identifier",
                                                   "span": {
-                                                    "start": 31996,
-                                                    "end": 32004
+                                                    "start": 11865,
+                                                    "end": 11873
                                                   },
                                                   "value": "priority"
                                                 }
@@ -2308,8 +2291,8 @@ export const compiledTemplate = [
                                         {
                                           "type": "TemplateElement",
                                           "span": {
-                                            "start": 31879,
-                                            "end": 31953
+                                            "start": 11748,
+                                            "end": 11822
                                           },
                                           "tail": false,
                                           "cooked": "font-size: 12px; padding: 2px 8px; border-radius: 12px; background-color: ",
@@ -2318,8 +2301,8 @@ export const compiledTemplate = [
                                         {
                                           "type": "TemplateElement",
                                           "span": {
-                                            "start": 32023,
-                                            "end": 32038
+                                            "start": 11892,
+                                            "end": 11907
                                           },
                                           "tail": true,
                                           "cooked": "; color: white;",
@@ -2337,8 +2320,8 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXText",
                                 "span": {
-                                  "start": 32056,
-                                  "end": 32073
+                                  "start": 11925,
+                                  "end": 11942
                                 },
                                 "value": "\n                ",
                                 "raw": "\n                "
@@ -2346,21 +2329,21 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXExpressionContainer",
                                 "span": {
-                                  "start": 32073,
-                                  "end": 32105
+                                  "start": 11942,
+                                  "end": 11974
                                 },
                                 "expression": {
                                   "type": "CallExpression",
                                   "span": {
-                                    "start": 32074,
-                                    "end": 32104
+                                    "start": 11943,
+                                    "end": 11973
                                   },
                                   "ctxt": 0,
                                   "callee": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 32074,
-                                      "end": 32089
+                                      "start": 11943,
+                                      "end": 11958
                                     },
                                     "ctxt": 1,
                                     "value": "getPriorityText",
@@ -2372,14 +2355,14 @@ export const compiledTemplate = [
                                       "expression": {
                                         "type": "MemberExpression",
                                         "span": {
-                                          "start": 32090,
-                                          "end": 32103
+                                          "start": 11959,
+                                          "end": 11972
                                         },
                                         "object": {
                                           "type": "Identifier",
                                           "span": {
-                                            "start": 32090,
-                                            "end": 32094
+                                            "start": 11959,
+                                            "end": 11963
                                           },
                                           "ctxt": 3,
                                           "value": "todo",
@@ -2388,8 +2371,8 @@ export const compiledTemplate = [
                                         "property": {
                                           "type": "Identifier",
                                           "span": {
-                                            "start": 32095,
-                                            "end": 32103
+                                            "start": 11964,
+                                            "end": 11972
                                           },
                                           "value": "priority"
                                         }
@@ -2402,8 +2385,8 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXText",
                                 "span": {
-                                  "start": 32105,
-                                  "end": 32120
+                                  "start": 11974,
+                                  "end": 11989
                                 },
                                 "value": "\n              ",
                                 "raw": "\n              "
@@ -2412,14 +2395,14 @@ export const compiledTemplate = [
                             "closing": {
                               "type": "JSXClosingElement",
                               "span": {
-                                "start": 32120,
-                                "end": 32127
+                                "start": 11989,
+                                "end": 11996
                               },
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 32122,
-                                  "end": 32126
+                                  "start": 11991,
+                                  "end": 11995
                                 },
                                 "ctxt": 1,
                                 "value": "span",
@@ -2430,8 +2413,8 @@ export const compiledTemplate = [
                           {
                             "type": "JSXText",
                             "span": {
-                              "start": 32127,
-                              "end": 32142
+                              "start": 11996,
+                              "end": 12011
                             },
                             "value": "\n              ",
                             "raw": "\n              "
@@ -2439,78 +2422,78 @@ export const compiledTemplate = [
                           {
                             "type": "JSXElement",
                             "span": {
-                              "start": 32142,
-                              "end": 32425
+                              "start": 12011,
+                              "end": 12294
                             },
                             "opening": {
                               "type": "JSXOpeningElement",
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 32143,
-                                  "end": 32147
+                                  "start": 12012,
+                                  "end": 12016
                                 },
                                 "ctxt": 1,
                                 "value": "span",
                                 "optional": false
                               },
                               "span": {
-                                "start": 32142,
-                                "end": 32360
+                                "start": 12011,
+                                "end": 12229
                               },
                               "attributes": [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 32164,
-                                    "end": 32344
+                                    "start": 12033,
+                                    "end": 12213
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 32164,
-                                      "end": 32169
+                                      "start": 12033,
+                                      "end": 12038
                                     },
                                     "value": "style"
                                   },
                                   "value": {
                                     "type": "JSXExpressionContainer",
                                     "span": {
-                                      "start": 32170,
-                                      "end": 32344
+                                      "start": 12039,
+                                      "end": 12213
                                     },
                                     "expression": {
                                       "type": "TemplateLiteral",
                                       "span": {
-                                        "start": 32171,
-                                        "end": 32343
+                                        "start": 12040,
+                                        "end": 12212
                                       },
                                       "expressions": [
                                         {
                                           "type": "ConditionalExpression",
                                           "span": {
-                                            "start": 32217,
-                                            "end": 32323
+                                            "start": 12086,
+                                            "end": 12192
                                           },
                                           "test": {
                                             "type": "BinaryExpression",
                                             "span": {
-                                              "start": 32217,
-                                              "end": 32259
+                                              "start": 12086,
+                                              "end": 12128
                                             },
                                             "operator": "&&",
                                             "left": {
                                               "type": "CallExpression",
                                               "span": {
-                                                "start": 32217,
-                                                "end": 32240
+                                                "start": 12086,
+                                                "end": 12109
                                               },
                                               "ctxt": 0,
                                               "callee": {
                                                 "type": "Identifier",
                                                 "span": {
-                                                  "start": 32217,
-                                                  "end": 32226
+                                                  "start": 12086,
+                                                  "end": 12095
                                                 },
                                                 "ctxt": 1,
                                                 "value": "isOverdue",
@@ -2522,14 +2505,14 @@ export const compiledTemplate = [
                                                   "expression": {
                                                     "type": "MemberExpression",
                                                     "span": {
-                                                      "start": 32227,
-                                                      "end": 32239
+                                                      "start": 12096,
+                                                      "end": 12108
                                                     },
                                                     "object": {
                                                       "type": "Identifier",
                                                       "span": {
-                                                        "start": 32227,
-                                                        "end": 32231
+                                                        "start": 12096,
+                                                        "end": 12100
                                                       },
                                                       "ctxt": 3,
                                                       "value": "todo",
@@ -2538,8 +2521,8 @@ export const compiledTemplate = [
                                                     "property": {
                                                       "type": "Identifier",
                                                       "span": {
-                                                        "start": 32232,
-                                                        "end": 32239
+                                                        "start": 12101,
+                                                        "end": 12108
                                                       },
                                                       "value": "dueDate"
                                                     }
@@ -2551,21 +2534,21 @@ export const compiledTemplate = [
                                             "right": {
                                               "type": "UnaryExpression",
                                               "span": {
-                                                "start": 32244,
-                                                "end": 32259
+                                                "start": 12113,
+                                                "end": 12128
                                               },
                                               "operator": "!",
                                               "argument": {
                                                 "type": "MemberExpression",
                                                 "span": {
-                                                  "start": 32245,
-                                                  "end": 32259
+                                                  "start": 12114,
+                                                  "end": 12128
                                                 },
                                                 "object": {
                                                   "type": "Identifier",
                                                   "span": {
-                                                    "start": 32245,
-                                                    "end": 32249
+                                                    "start": 12114,
+                                                    "end": 12118
                                                   },
                                                   "ctxt": 3,
                                                   "value": "todo",
@@ -2574,8 +2557,8 @@ export const compiledTemplate = [
                                                 "property": {
                                                   "type": "Identifier",
                                                   "span": {
-                                                    "start": 32250,
-                                                    "end": 32259
+                                                    "start": 12119,
+                                                    "end": 12128
                                                   },
                                                   "value": "completed"
                                                 }
@@ -2585,8 +2568,8 @@ export const compiledTemplate = [
                                           "consequent": {
                                             "type": "StringLiteral",
                                             "span": {
-                                              "start": 32282,
-                                              "end": 32291
+                                              "start": 12151,
+                                              "end": 12160
                                             },
                                             "value": "#dc2626",
                                             "raw": "\"#dc2626\""
@@ -2594,8 +2577,8 @@ export const compiledTemplate = [
                                           "alternate": {
                                             "type": "StringLiteral",
                                             "span": {
-                                              "start": 32314,
-                                              "end": 32323
+                                              "start": 12183,
+                                              "end": 12192
                                             },
                                             "value": "#6b7280",
                                             "raw": "\"#6b7280\""
@@ -2606,8 +2589,8 @@ export const compiledTemplate = [
                                         {
                                           "type": "TemplateElement",
                                           "span": {
-                                            "start": 32172,
-                                            "end": 32196
+                                            "start": 12041,
+                                            "end": 12065
                                           },
                                           "tail": false,
                                           "cooked": "font-size: 12px; color: ",
@@ -2616,8 +2599,8 @@ export const compiledTemplate = [
                                         {
                                           "type": "TemplateElement",
                                           "span": {
-                                            "start": 32341,
-                                            "end": 32342
+                                            "start": 12210,
+                                            "end": 12211
                                           },
                                           "tail": true,
                                           "cooked": ";",
@@ -2635,8 +2618,8 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXText",
                                 "span": {
-                                  "start": 32360,
-                                  "end": 32377
+                                  "start": 12229,
+                                  "end": 12246
                                 },
                                 "value": "\n                ",
                                 "raw": "\n                "
@@ -2644,21 +2627,21 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXExpressionContainer",
                                 "span": {
-                                  "start": 32377,
-                                  "end": 32403
+                                  "start": 12246,
+                                  "end": 12272
                                 },
                                 "expression": {
                                   "type": "CallExpression",
                                   "span": {
-                                    "start": 32378,
-                                    "end": 32402
+                                    "start": 12247,
+                                    "end": 12271
                                   },
                                   "ctxt": 0,
                                   "callee": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 32378,
-                                      "end": 32388
+                                      "start": 12247,
+                                      "end": 12257
                                     },
                                     "ctxt": 1,
                                     "value": "formatDate",
@@ -2670,14 +2653,14 @@ export const compiledTemplate = [
                                       "expression": {
                                         "type": "MemberExpression",
                                         "span": {
-                                          "start": 32389,
-                                          "end": 32401
+                                          "start": 12258,
+                                          "end": 12270
                                         },
                                         "object": {
                                           "type": "Identifier",
                                           "span": {
-                                            "start": 32389,
-                                            "end": 32393
+                                            "start": 12258,
+                                            "end": 12262
                                           },
                                           "ctxt": 3,
                                           "value": "todo",
@@ -2686,8 +2669,8 @@ export const compiledTemplate = [
                                         "property": {
                                           "type": "Identifier",
                                           "span": {
-                                            "start": 32394,
-                                            "end": 32401
+                                            "start": 12263,
+                                            "end": 12270
                                           },
                                           "value": "dueDate"
                                         }
@@ -2700,8 +2683,8 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXText",
                                 "span": {
-                                  "start": 32403,
-                                  "end": 32418
+                                  "start": 12272,
+                                  "end": 12287
                                 },
                                 "value": "\n              ",
                                 "raw": "\n              "
@@ -2710,14 +2693,14 @@ export const compiledTemplate = [
                             "closing": {
                               "type": "JSXClosingElement",
                               "span": {
-                                "start": 32418,
-                                "end": 32425
+                                "start": 12287,
+                                "end": 12294
                               },
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 32420,
-                                  "end": 32424
+                                  "start": 12289,
+                                  "end": 12293
                                 },
                                 "ctxt": 1,
                                 "value": "span",
@@ -2728,8 +2711,8 @@ export const compiledTemplate = [
                           {
                             "type": "JSXText",
                             "span": {
-                              "start": 32425,
-                              "end": 32440
+                              "start": 12294,
+                              "end": 12309
                             },
                             "value": "\n              ",
                             "raw": "\n              "
@@ -2737,45 +2720,45 @@ export const compiledTemplate = [
                           {
                             "type": "JSXElement",
                             "span": {
-                              "start": 32440,
-                              "end": 32720
+                              "start": 12309,
+                              "end": 12589
                             },
                             "opening": {
                               "type": "JSXOpeningElement",
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 32441,
-                                  "end": 32447
+                                  "start": 12310,
+                                  "end": 12316
                                 },
                                 "ctxt": 1,
                                 "value": "button",
                                 "optional": false
                               },
                               "span": {
-                                "start": 32440,
-                                "end": 32673
+                                "start": 12309,
+                                "end": 12542
                               },
                               "attributes": [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 32464,
-                                    "end": 32598
+                                    "start": 12333,
+                                    "end": 12467
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 32464,
-                                      "end": 32469
+                                      "start": 12333,
+                                      "end": 12338
                                     },
                                     "value": "style"
                                   },
                                   "value": {
                                     "type": "StringLiteral",
                                     "span": {
-                                      "start": 32470,
-                                      "end": 32598
+                                      "start": 12339,
+                                      "end": 12467
                                     },
                                     "value": "padding: 4px 8px; background-color: #dc2626; color: white; border-radius: 4px; border: none; cursor: pointer; font-size: 12px;",
                                     "raw": "\"padding: 4px 8px; background-color: #dc2626; color: white; border-radius: 4px; border: none; cursor: pointer; font-size: 12px;\""
@@ -2784,43 +2767,43 @@ export const compiledTemplate = [
                                 {
                                   "type": "JSXAttribute",
                                   "span": {
-                                    "start": 32615,
-                                    "end": 32657
+                                    "start": 12484,
+                                    "end": 12526
                                   },
                                   "name": {
                                     "type": "Identifier",
                                     "span": {
-                                      "start": 32615,
-                                      "end": 32622
+                                      "start": 12484,
+                                      "end": 12491
                                     },
                                     "value": "onClick"
                                   },
                                   "value": {
                                     "type": "JSXExpressionContainer",
                                     "span": {
-                                      "start": 32623,
-                                      "end": 32657
+                                      "start": 12492,
+                                      "end": 12526
                                     },
                                     "expression": {
                                       "type": "ArrowFunctionExpression",
                                       "span": {
-                                        "start": 32624,
-                                        "end": 32656
+                                        "start": 12493,
+                                        "end": 12525
                                       },
                                       "ctxt": 0,
                                       "params": [],
                                       "body": {
                                         "type": "CallExpression",
                                         "span": {
-                                          "start": 32630,
-                                          "end": 32656
+                                          "start": 12499,
+                                          "end": 12525
                                         },
                                         "ctxt": 0,
                                         "callee": {
                                           "type": "Identifier",
                                           "span": {
-                                            "start": 32630,
-                                            "end": 32647
+                                            "start": 12499,
+                                            "end": 12516
                                           },
                                           "ctxt": 1,
                                           "value": "handleDeleteClick",
@@ -2832,14 +2815,14 @@ export const compiledTemplate = [
                                             "expression": {
                                               "type": "MemberExpression",
                                               "span": {
-                                                "start": 32648,
-                                                "end": 32655
+                                                "start": 12517,
+                                                "end": 12524
                                               },
                                               "object": {
                                                 "type": "Identifier",
                                                 "span": {
-                                                  "start": 32648,
-                                                  "end": 32652
+                                                  "start": 12517,
+                                                  "end": 12521
                                                 },
                                                 "ctxt": 3,
                                                 "value": "todo",
@@ -2848,8 +2831,8 @@ export const compiledTemplate = [
                                               "property": {
                                                 "type": "Identifier",
                                                 "span": {
-                                                  "start": 32653,
-                                                  "end": 32655
+                                                  "start": 12522,
+                                                  "end": 12524
                                                 },
                                                 "value": "id"
                                               }
@@ -2873,8 +2856,8 @@ export const compiledTemplate = [
                               {
                                 "type": "JSXText",
                                 "span": {
-                                  "start": 32673,
-                                  "end": 32711
+                                  "start": 12542,
+                                  "end": 12580
                                 },
                                 "value": "\n                刪除\n              ",
                                 "raw": "\n                刪除\n              "
@@ -2883,14 +2866,14 @@ export const compiledTemplate = [
                             "closing": {
                               "type": "JSXClosingElement",
                               "span": {
-                                "start": 32711,
-                                "end": 32720
+                                "start": 12580,
+                                "end": 12589
                               },
                               "name": {
                                 "type": "Identifier",
                                 "span": {
-                                  "start": 32713,
-                                  "end": 32719
+                                  "start": 12582,
+                                  "end": 12588
                                 },
                                 "ctxt": 1,
                                 "value": "button",
@@ -2901,8 +2884,8 @@ export const compiledTemplate = [
                           {
                             "type": "JSXText",
                             "span": {
-                              "start": 32720,
-                              "end": 32733
+                              "start": 12589,
+                              "end": 12602
                             },
                             "value": "\n            ",
                             "raw": "\n            "
@@ -2911,14 +2894,14 @@ export const compiledTemplate = [
                         "closing": {
                           "type": "JSXClosingElement",
                           "span": {
-                            "start": 32733,
-                            "end": 32739
+                            "start": 12602,
+                            "end": 12608
                           },
                           "name": {
                             "type": "Identifier",
                             "span": {
-                              "start": 32735,
-                              "end": 32738
+                              "start": 12604,
+                              "end": 12607
                             },
                             "ctxt": 1,
                             "value": "div",
@@ -2929,8 +2912,8 @@ export const compiledTemplate = [
                       {
                         "type": "JSXText",
                         "span": {
-                          "start": 32739,
-                          "end": 32750
+                          "start": 12608,
+                          "end": 12619
                         },
                         "value": "\n          ",
                         "raw": "\n          "
@@ -2939,14 +2922,14 @@ export const compiledTemplate = [
                     "closing": {
                       "type": "JSXClosingElement",
                       "span": {
-                        "start": 32750,
-                        "end": 32756
+                        "start": 12619,
+                        "end": 12625
                       },
                       "name": {
                         "type": "Identifier",
                         "span": {
-                          "start": 32752,
-                          "end": 32755
+                          "start": 12621,
+                          "end": 12624
                         },
                         "ctxt": 1,
                         "value": "div",
@@ -2976,29 +2959,29 @@ export const compiledTemplate = [
     "expression": {
       "type": "BinaryExpression",
       "span": {
-        "start": 32794,
-        "end": 33254
+        "start": 12663,
+        "end": 13123
       },
       "operator": "&&",
       "left": {
         "type": "BinaryExpression",
         "span": {
-          "start": 32794,
-          "end": 32814
+          "start": 12663,
+          "end": 12683
         },
         "operator": ">",
         "left": {
           "type": "CallExpression",
           "span": {
-            "start": 32794,
-            "end": 32810
+            "start": 12663,
+            "end": 12679
           },
           "ctxt": 0,
           "callee": {
             "type": "Identifier",
             "span": {
-              "start": 32794,
-              "end": 32808
+              "start": 12663,
+              "end": 12677
             },
             "ctxt": 1,
             "value": "totalTodoCount",
@@ -3010,8 +2993,8 @@ export const compiledTemplate = [
         "right": {
           "type": "NumericLiteral",
           "span": {
-            "start": 32813,
-            "end": 32814
+            "start": 12682,
+            "end": 12683
           },
           "value": 0,
           "raw": "0"
@@ -3020,51 +3003,51 @@ export const compiledTemplate = [
       "right": {
         "type": "ParenthesisExpression",
         "span": {
-          "start": 32818,
-          "end": 33254
+          "start": 12687,
+          "end": 13123
         },
         "expression": {
           "type": "JSXElement",
           "span": {
-            "start": 32826,
-            "end": 33248
+            "start": 12695,
+            "end": 13117
           },
           "opening": {
             "type": "JSXOpeningElement",
             "name": {
               "type": "Identifier",
               "span": {
-                "start": 32827,
-                "end": 32833
+                "start": 12696,
+                "end": 12702
               },
               "ctxt": 1,
               "value": "footer",
               "optional": false
             },
             "span": {
-              "start": 32826,
-              "end": 32963
+              "start": 12695,
+              "end": 12832
             },
             "attributes": [
               {
                 "type": "JSXAttribute",
                 "span": {
-                  "start": 32834,
-                  "end": 32962
+                  "start": 12703,
+                  "end": 12831
                 },
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 32834,
-                    "end": 32839
+                    "start": 12703,
+                    "end": 12708
                   },
                   "value": "style"
                 },
                 "value": {
                   "type": "StringLiteral",
                   "span": {
-                    "start": 32840,
-                    "end": 32962
+                    "start": 12709,
+                    "end": 12831
                   },
                   "value": "margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 14px; color: #6b7280;",
                   "raw": "\"margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 14px; color: #6b7280;\""
@@ -3078,8 +3061,8 @@ export const compiledTemplate = [
             {
               "type": "JSXText",
               "span": {
-                "start": 32963,
-                "end": 32972
+                "start": 12832,
+                "end": 12841
               },
               "value": "\n        ",
               "raw": "\n        "
@@ -3087,24 +3070,24 @@ export const compiledTemplate = [
             {
               "type": "JSXElement",
               "span": {
-                "start": 32972,
-                "end": 33232
+                "start": 12841,
+                "end": 13101
               },
               "opening": {
                 "type": "JSXOpeningElement",
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 32973,
-                    "end": 32974
+                    "start": 12842,
+                    "end": 12843
                   },
                   "ctxt": 1,
                   "value": "p",
                   "optional": false
                 },
                 "span": {
-                  "start": 32972,
-                  "end": 32975
+                  "start": 12841,
+                  "end": 12844
                 },
                 "attributes": [],
                 "selfClosing": false,
@@ -3114,8 +3097,8 @@ export const compiledTemplate = [
                 {
                   "type": "JSXText",
                   "span": {
-                    "start": 32975,
-                    "end": 32993
+                    "start": 12844,
+                    "end": 12862
                   },
                   "value": "\n          總共 ",
                   "raw": "\n          總共 "
@@ -3123,21 +3106,21 @@ export const compiledTemplate = [
                 {
                   "type": "JSXExpressionContainer",
                   "span": {
-                    "start": 32993,
-                    "end": 33011
+                    "start": 12862,
+                    "end": 12880
                   },
                   "expression": {
                     "type": "CallExpression",
                     "span": {
-                      "start": 32994,
-                      "end": 33010
+                      "start": 12863,
+                      "end": 12879
                     },
                     "ctxt": 0,
                     "callee": {
                       "type": "Identifier",
                       "span": {
-                        "start": 32994,
-                        "end": 33008
+                        "start": 12863,
+                        "end": 12877
                       },
                       "ctxt": 1,
                       "value": "totalTodoCount",
@@ -3150,8 +3133,8 @@ export const compiledTemplate = [
                 {
                   "type": "JSXText",
                   "span": {
-                    "start": 33011,
-                    "end": 33032
+                    "start": 12880,
+                    "end": 12901
                   },
                   "value": " 個事項\n          ",
                   "raw": " 個事項\n          "
@@ -3159,34 +3142,34 @@ export const compiledTemplate = [
                 {
                   "type": "JSXExpressionContainer",
                   "span": {
-                    "start": 33032,
-                    "end": 33108
+                    "start": 12901,
+                    "end": 12977
                   },
                   "expression": {
                     "type": "ConditionalExpression",
                     "span": {
-                      "start": 33033,
-                      "end": 33107
+                      "start": 12902,
+                      "end": 12976
                     },
                     "test": {
                       "type": "BinaryExpression",
                       "span": {
-                        "start": 33033,
-                        "end": 33054
+                        "start": 12902,
+                        "end": 12923
                       },
                       "operator": ">",
                       "left": {
                         "type": "CallExpression",
                         "span": {
-                          "start": 33033,
-                          "end": 33050
+                          "start": 12902,
+                          "end": 12919
                         },
                         "ctxt": 0,
                         "callee": {
                           "type": "Identifier",
                           "span": {
-                            "start": 33033,
-                            "end": 33048
+                            "start": 12902,
+                            "end": 12917
                           },
                           "ctxt": 1,
                           "value": "activeTodoCount",
@@ -3198,8 +3181,8 @@ export const compiledTemplate = [
                       "right": {
                         "type": "NumericLiteral",
                         "span": {
-                          "start": 33053,
-                          "end": 33054
+                          "start": 12922,
+                          "end": 12923
                         },
                         "value": 0,
                         "raw": "0"
@@ -3208,22 +3191,22 @@ export const compiledTemplate = [
                     "consequent": {
                       "type": "TemplateLiteral",
                       "span": {
-                        "start": 33057,
-                        "end": 33102
+                        "start": 12926,
+                        "end": 12971
                       },
                       "expressions": [
                         {
                           "type": "CallExpression",
                           "span": {
-                            "start": 33070,
-                            "end": 33087
+                            "start": 12939,
+                            "end": 12956
                           },
                           "ctxt": 0,
                           "callee": {
                             "type": "Identifier",
                             "span": {
-                              "start": 33070,
-                              "end": 33085
+                              "start": 12939,
+                              "end": 12954
                             },
                             "ctxt": 1,
                             "value": "activeTodoCount",
@@ -3237,8 +3220,8 @@ export const compiledTemplate = [
                         {
                           "type": "TemplateElement",
                           "span": {
-                            "start": 33058,
-                            "end": 33068
+                            "start": 12927,
+                            "end": 12937
                           },
                           "tail": false,
                           "cooked": "，還有 ",
@@ -3247,8 +3230,8 @@ export const compiledTemplate = [
                         {
                           "type": "TemplateElement",
                           "span": {
-                            "start": 33088,
-                            "end": 33101
+                            "start": 12957,
+                            "end": 12970
                           },
                           "tail": true,
                           "cooked": " 個待完成",
@@ -3259,8 +3242,8 @@ export const compiledTemplate = [
                     "alternate": {
                       "type": "StringLiteral",
                       "span": {
-                        "start": 33105,
-                        "end": 33107
+                        "start": 12974,
+                        "end": 12976
                       },
                       "value": "",
                       "raw": "\"\""
@@ -3270,8 +3253,8 @@ export const compiledTemplate = [
                 {
                   "type": "JSXText",
                   "span": {
-                    "start": 33108,
-                    "end": 33119
+                    "start": 12977,
+                    "end": 12988
                   },
                   "value": "\n          ",
                   "raw": "\n          "
@@ -3279,34 +3262,34 @@ export const compiledTemplate = [
                 {
                   "type": "JSXExpressionContainer",
                   "span": {
-                    "start": 33119,
-                    "end": 33219
+                    "start": 12988,
+                    "end": 13088
                   },
                   "expression": {
                     "type": "ConditionalExpression",
                     "span": {
-                      "start": 33120,
-                      "end": 33218
+                      "start": 12989,
+                      "end": 13087
                     },
                     "test": {
                       "type": "BinaryExpression",
                       "span": {
-                        "start": 33120,
-                        "end": 33144
+                        "start": 12989,
+                        "end": 13013
                       },
                       "operator": ">",
                       "left": {
                         "type": "CallExpression",
                         "span": {
-                          "start": 33120,
-                          "end": 33140
+                          "start": 12989,
+                          "end": 13009
                         },
                         "ctxt": 0,
                         "callee": {
                           "type": "Identifier",
                           "span": {
-                            "start": 33120,
-                            "end": 33138
+                            "start": 12989,
+                            "end": 13007
                           },
                           "ctxt": 1,
                           "value": "completedTodoCount",
@@ -3318,8 +3301,8 @@ export const compiledTemplate = [
                       "right": {
                         "type": "NumericLiteral",
                         "span": {
-                          "start": 33143,
-                          "end": 33144
+                          "start": 13012,
+                          "end": 13013
                         },
                         "value": 0,
                         "raw": "0"
@@ -3328,22 +3311,22 @@ export const compiledTemplate = [
                     "consequent": {
                       "type": "TemplateLiteral",
                       "span": {
-                        "start": 33159,
-                        "end": 33201
+                        "start": 13028,
+                        "end": 13070
                       },
                       "expressions": [
                         {
                           "type": "CallExpression",
                           "span": {
-                            "start": 33175,
-                            "end": 33195
+                            "start": 13044,
+                            "end": 13064
                           },
                           "ctxt": 0,
                           "callee": {
                             "type": "Identifier",
                             "span": {
-                              "start": 33175,
-                              "end": 33193
+                              "start": 13044,
+                              "end": 13062
                             },
                             "ctxt": 1,
                             "value": "completedTodoCount",
@@ -3357,8 +3340,8 @@ export const compiledTemplate = [
                         {
                           "type": "TemplateElement",
                           "span": {
-                            "start": 33160,
-                            "end": 33173
+                            "start": 13029,
+                            "end": 13042
                           },
                           "tail": false,
                           "cooked": "，已完成 ",
@@ -3367,8 +3350,8 @@ export const compiledTemplate = [
                         {
                           "type": "TemplateElement",
                           "span": {
-                            "start": 33196,
-                            "end": 33200
+                            "start": 13065,
+                            "end": 13069
                           },
                           "tail": true,
                           "cooked": " 個",
@@ -3379,8 +3362,8 @@ export const compiledTemplate = [
                     "alternate": {
                       "type": "StringLiteral",
                       "span": {
-                        "start": 33216,
-                        "end": 33218
+                        "start": 13085,
+                        "end": 13087
                       },
                       "value": "",
                       "raw": "\"\""
@@ -3390,8 +3373,8 @@ export const compiledTemplate = [
                 {
                   "type": "JSXText",
                   "span": {
-                    "start": 33219,
-                    "end": 33228
+                    "start": 13088,
+                    "end": 13097
                   },
                   "value": "\n        ",
                   "raw": "\n        "
@@ -3400,14 +3383,14 @@ export const compiledTemplate = [
               "closing": {
                 "type": "JSXClosingElement",
                 "span": {
-                  "start": 33228,
-                  "end": 33232
+                  "start": 13097,
+                  "end": 13101
                 },
                 "name": {
                   "type": "Identifier",
                   "span": {
-                    "start": 33230,
-                    "end": 33231
+                    "start": 13099,
+                    "end": 13100
                   },
                   "ctxt": 1,
                   "value": "p",
@@ -3418,8 +3401,8 @@ export const compiledTemplate = [
             {
               "type": "JSXText",
               "span": {
-                "start": 33232,
-                "end": 33239
+                "start": 13101,
+                "end": 13108
               },
               "value": "\n      ",
               "raw": "\n      "
@@ -3428,14 +3411,14 @@ export const compiledTemplate = [
           "closing": {
             "type": "JSXClosingElement",
             "span": {
-              "start": 33239,
-              "end": 33248
+              "start": 13108,
+              "end": 13117
             },
             "name": {
               "type": "Identifier",
               "span": {
-                "start": 33241,
-                "end": 33247
+                "start": 13110,
+                "end": 13116
               },
               "ctxt": 1,
               "value": "footer",
@@ -3451,4 +3434,4 @@ export const compiledTemplate = [
     "content": "</div></div>"
   }
 ];
-export const lastCompiled = 1750651227751;
+export const lastCompiled = 1750726303141;

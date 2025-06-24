@@ -9,29 +9,10 @@ const booleanAttrSet = new Set([
   "hidden",
   "readonly",
 ]);
-
-const interactiveElements = new Set(["SELECT", "OPTION", "TEXTAREA"]);
-const interactiveElementStateMap = new Map([
-  ["INPUT:text", "value"],
-  ["INPUT:password", "value"],
-  ["INPUT:email", "value"],
-  ["INPUT:number", "value"],
-  ["INPUT:search", "value"],
-  ["INPUT:url", "value"],
-  ["INPUT:tel", "value"],
-  ["INPUT:checkbox", "checked"],
-  ["INPUT:radio", "checked"],
+const attrMap = new Map([
+  ["className", "class"],
+  ["htmlFor", "for"],
 ]);
-function syncProperty(element, attrName, attrValue) {
-  const tagName = element.tagName;
-
-  const key = `${tagName}:${element.type ?? ""}`;
-  const propName = interactiveElementStateMap.get(key);
-
-  if (propName === attrName || interactiveElements.has(tagName)) {
-    element[attrName] = attrValue;
-  }
-}
 const BINDING_PATTERNS = {
   REACT_EVENT: /\s+(on[A-Z][a-zA-Z]*)\s*=\s*$/,
   ATTR: /\s+([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*$/,
@@ -48,9 +29,11 @@ function detectBindingType(templateSoFar) {
 
   const attrMatch = context.match(BINDING_PATTERNS.ATTR);
   if (attrMatch) {
+    const originalName = attrMatch[1];
+    const mappedName = attrMap.get(originalName) ?? originalName;
     return {
       type: "attr",
-      name: attrMatch[1] === "className" ? "class" : attrMatch[1],
+      name: mappedName,
     };
   }
 
@@ -150,64 +133,49 @@ const processElementBinding = ({
   elementCounter,
   elementIdMap,
 }) => {
-  let elementId;
-  let updatedTemplate;
+  const config =
+    info.type === "event"
+      ? {
+          pattern: new RegExp(`\\s+${info.name}\\s*=\\s*"{{EVENT_${index}}}"`),
+          replacement: "",
+          patternName: `事件屬性模式: ${info.name}`,
+        }
+      : {
+          pattern: `"{{ATTR_${index}}}"`,
+          replacement: '""',
+          patternName: `屬性模式: "{{ATTR_${index}}}"`,
+        };
 
-  if (info.type === "event") {
-    const eventAttrPattern = new RegExp(
-      `\\s+${info.name}\\s*=\\s*"{{EVENT_${index}}}"`
-    );
+  const matchIndex =
+    info.type === "event"
+      ? processedTemplate.search(config.pattern)
+      : processedTemplate.indexOf(config.pattern);
 
-    const matchIndex = processedTemplate.search(eventAttrPattern);
-    if (matchIndex === -1) {
-      console.warn(`未找到事件屬性模式: ${info.name}`);
-      return { elementId: null, processedTemplate, elementCounter };
-    }
-
-    const beforeEventAttr = processedTemplate.substring(0, matchIndex);
-    const elementPosition = beforeEventAttr.lastIndexOf("<");
-
-    elementId = getOrCreateElementId(
-      elementPosition,
-      elementIdMap,
-      elementCounter++
-    );
-
-    const hasDataElementId = processedTemplate.includes(
-      `data-element-id="${elementId}"`
-    );
-
-    updatedTemplate = processedTemplate.replace(
-      eventAttrPattern,
-      hasDataElementId ? "" : ` data-element-id="${elementId}"`
-    );
-  } else {
-    const oldPattern = `"{{ATTR_${index}}}"`;
-    const patternIndex = processedTemplate.indexOf(oldPattern);
-
-    if (patternIndex === -1) {
-      console.warn(`未找到屬性模式: ${oldPattern}`);
-      return { elementId: null, processedTemplate, elementCounter };
-    }
-
-    const templateUpToHere = processedTemplate.substring(0, patternIndex);
-    const elementPosition = templateUpToHere.lastIndexOf("<");
-
-    elementId = getOrCreateElementId(
-      elementPosition,
-      elementIdMap,
-      elementCounter++
-    );
-
-    const hasDataElementId = processedTemplate.includes(
-      `data-element-id="${elementId}"`
-    );
-    const newPattern = hasDataElementId
-      ? '""'
-      : `"" data-element-id="${elementId}"`;
-
-    updatedTemplate = processedTemplate.replace(oldPattern, newPattern);
+  if (matchIndex === -1) {
+    console.warn(`未找到${config.patternName}`);
+    return { elementId: null, processedTemplate, elementCounter };
   }
+
+  const beforePattern = processedTemplate.substring(0, matchIndex);
+  const elementPosition = beforePattern.lastIndexOf("<");
+
+  const elementId = getOrCreateElementId(
+    elementPosition,
+    elementIdMap,
+    elementCounter++
+  );
+  const hasDataElementId = processedTemplate.includes(
+    `data-element-id="${elementId}"`
+  );
+
+  const replacement = hasDataElementId
+    ? config.replacement
+    : `${config.replacement} data-element-id="${elementId}"`;
+
+  const updatedTemplate = processedTemplate.replace(
+    config.pattern,
+    replacement
+  );
 
   return { elementId, processedTemplate: updatedTemplate, elementCounter };
 };
@@ -241,16 +209,25 @@ const applyElementBindings = (elementBindings, container, effect) => {
 
 const watchAttr = (element, info, binding) => {
   const { name: attrName } = info;
+
   return () => {
     const value = binding();
-    const shouldSetAttribute = value != null && value !== false;
-
-    if (shouldSetAttribute) {
-      element.setAttribute(attrName, value);
-      syncProperty(element, attrName, value);
+    if (booleanAttrSet.has(attrName)) {
+      element[attrName] = !!value;
+      if (value) {
+        element.setAttribute(attrName, "");
+      } else {
+        element.removeAttribute(attrName);
+      }
     } else {
-      element.removeAttribute(attrName);
-      syncProperty(element, attrName, "");
+      const shouldSetAttribute =
+        value != null && value !== false && value !== "";
+      if (shouldSetAttribute) {
+        element.setAttribute(attrName, value);
+      } else {
+        element.removeAttribute(attrName);
+      }
+      element[attrName] = value;
     }
   };
 };
@@ -260,11 +237,6 @@ const applyEventBinding = (element, info, binding) => {
   const actualEventName = eventName.startsWith("on")
     ? eventName.slice(2).toLowerCase()
     : eventName.toLowerCase();
-
-  [eventName, eventName.toLowerCase(), actualEventName].forEach((name) => {
-    element.removeAttribute(name);
-    element[name] = null;
-  });
 
   const handler = binding();
   if (typeof handler !== "function") {
@@ -281,12 +253,6 @@ const applyEventBinding = (element, info, binding) => {
   };
 
   element.addEventListener(actualEventName, wrappedHandler);
-
-  setTimeout(() => {
-    [eventName, eventName.toLowerCase(), actualEventName].forEach((name) => {
-      element.removeAttribute(name);
-    });
-  }, 0);
 };
 
 const traverseComment = (container) => {
@@ -363,7 +329,6 @@ const watchChildren = (elNode, binding, context) => {
 
   return () => {
     const value = binding();
-
     if (isEqual(value, previousValue)) return;
 
     clearManagedNodes();
@@ -410,28 +375,12 @@ function applyJSXEventBindings(container, context) {
     const eventData = element.getAttribute("data-jsx-event");
     const [eventType, functionName] = eventData.split(":");
 
-    let handler = null;
-
-    if (functionName.startsWith("__jsx_")) {
-      const globalEnv =
-        typeof window !== "undefined"
-          ? window
-          : typeof global !== "undefined"
-          ? global
-          : {};
-
-      if (globalEnv.__jsxEventHandlers?.[functionName]) {
-        handler = globalEnv.__jsxEventHandlers[functionName];
-
-        delete globalEnv.__jsxEventHandlers[functionName];
+    if (typeof window !== undefined) {
+      const handler = window.__jsxEventHandlers[functionName];
+      if (handler && typeof handler === "function") {
+        element.addEventListener(eventType, handler);
+        element.removeAttribute("data-jsx-event");
       }
-    } else if (context?.[functionName]) {
-      handler = context[functionName];
-    }
-
-    if (handler && typeof handler === "function") {
-      element.addEventListener(eventType, handler);
-      element.removeAttribute("data-jsx-event");
     }
   });
 }
