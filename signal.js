@@ -22,11 +22,13 @@ function signal(initialState) {
   signalFn.set = (value) => {
     const newState = typeof value === "function" ? value(state) : value;
 
-    if (state !== newState) {
-      state = newState;
-      const subsToRun = [...subscribers];
-      subsToRun.forEach((sub) => sub());
+    if (Object.is(state, newState)) {
+      return;
     }
+
+    state = newState;
+    const subsToRun = [...subscribers];
+    subsToRun.forEach((sub) => sub());
   };
 
   return signalFn;

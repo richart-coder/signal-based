@@ -1,18 +1,16 @@
 import { parseSync } from "@swc/core";
-import convertJSXToTemplateParts from "./src/convertJSXToTemplateParts.js";
 
 import fs from "fs";
 import chokidar from "chokidar";
 
 function compileJSX(jsxContent) {
-  const ast = parseSync(jsxContent, {
+  const jsxAST = parseSync(jsxContent, {
     syntax: "ecmascript",
     jsx: true,
   });
 
-  const templateParts = convertJSXToTemplateParts(ast);
   const compiledData = `
-export const compiledTemplate = ${JSON.stringify(templateParts, null, 2)};
+export const jsxAST = ${JSON.stringify(jsxAST, null, 2)};
 export const lastCompiled = ${Date.now()};
 `;
 

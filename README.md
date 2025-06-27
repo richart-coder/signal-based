@@ -156,21 +156,6 @@ const handleToggleTodo = (id) => {
 
 ## 🔧 進階功能
 
-### 模板緩存
-
-```javascript
-import templateCache from "./templateCache.js";
-
-// 自動緩存編譯後的模板
-const template = templateCache.getOrCreate(
-  compiledTemplate,
-  options,
-  generateReactiveTemplate
-);
-```
-
-### 性能優化技巧
-
 1. **使用 Immutable 更新**: 確保觸發響應式更新
 
 ```javascript
