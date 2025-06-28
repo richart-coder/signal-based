@@ -36,8 +36,9 @@
     </div>
 
     <div style="margin-bottom: 10px;">
-      <label>溫度: </label>
+      <label htmlFor="temperature-input">溫度:</label>
       <input
+        id="temperature-input"
         type="number"
         step="0.1"
         value={temperature()}
@@ -47,8 +48,9 @@
     </div>
 
     <div style="margin-bottom: 10px;">
-      <label>交易量: </label>
+      <label htmlFor="volume-input">交易量:</label>
       <input
+        id="volume-input"
         type="number"
         step="0.001"
         value={volumeRatio()}
@@ -58,8 +60,9 @@
     </div>
 
     <div style="margin-bottom: 10px;">
-      <label>價格: </label>
+      <label htmlFor="price-input">價格:</label>
       <input
+        id="price-input"
         type="number"
         step="0.01"
         value={price()}
@@ -69,8 +72,9 @@
     </div>
 
     <div style="margin-bottom: 10px;">
-      <label>用戶名: </label>
+      <label htmlFor="user-input">用戶名:</label>
       <input
+        id="user-input"
         type="text"
         value={userName()}
         onInput={handleUserChange}
