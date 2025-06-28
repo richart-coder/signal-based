@@ -29,11 +29,15 @@ watcher.on("change", (filePath) => {
   console.log(`📝 檢測到 ${filePath} 變化，重新編譯...`);
   const jsxContent = fs.readFileSync(filePath, "utf8");
   compileJSX(jsxContent);
+  console.log(`📝 編譯完成`);
+});
+
+watcher.on("error", (error) => {
+  console.error(`❌ 檔案監聽錯誤:`, error.message);
 });
 
 console.log("🔍 開始監聽 JSX 文件變化...");
 
-// 初始編譯
 if (fs.existsSync("./src/template.jsx")) {
   const jsxContent = fs.readFileSync("./src/template.jsx", "utf8");
   compileJSX(jsxContent);

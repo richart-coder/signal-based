@@ -23,17 +23,18 @@ export default function generateReactiveTemplate(jsxAST, context) {
   }
 
   function setAttr(el, name, value, syncProp = true) {
-    if (BOOLEAN_ATTRS.has(name)) {
-      if (value) el.setAttribute(name, "");
-      else el.removeAttribute(name);
-      if (syncProp) el[name] = !!value;
+    const attrName = ATTR_MAP.get(name) ?? name;
+    if (BOOLEAN_ATTRS.has(attrName)) {
+      if (value) el.setAttribute(attrName, "");
+      else el.removeAttribute(attrName);
+      if (syncProp) el[attrName] = !!value;
     } else {
       if (value != null && value !== false) {
-        el.setAttribute(name, value);
-        if (syncProp) el[name] = value;
+        el.setAttribute(attrName, value);
+        if (syncProp) el[attrName] = value;
       } else {
-        el.removeAttribute(name);
-        if (syncProp) el[name] = null;
+        el.removeAttribute(attrName);
+        if (syncProp) el[attrName] = null;
       }
     }
   }
