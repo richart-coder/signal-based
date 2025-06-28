@@ -94,7 +94,6 @@ export default function generateReactiveTemplate(jsxAST, context) {
 
           effect(() => {
             const val = binding();
-
             if (Array.isArray(val)) {
               if (!Array.isArray(prevVal)) clearNodesAfter(anchor);
               renderList(val, anchor, itemNodes, prevVal);
@@ -154,7 +153,6 @@ export default function generateReactiveTemplate(jsxAST, context) {
 
   function renderList(items, anchor, itemNodes, prevItems) {
     const keys = new Set(items.map(getKey));
-
     itemNodes.forEach((nodeInfo, key) => {
       if (!keys.has(key)) {
         nodeInfo.cleanup?.forEach((fn) => fn());

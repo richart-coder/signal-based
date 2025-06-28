@@ -158,13 +158,15 @@ export default class JSXEvaluator {
     const variableName = node.value;
     return () => {
       try {
-        let value = this.context[variableName] || GLOBAL_ENV[variableName];
-
-        if (value === undefined || value === null) {
-          return undefined;
+        if (this.context.hasOwnProperty(variableName)) {
+          return this.context[variableName];
         }
 
-        return value;
+        if (GLOBAL_ENV.hasOwnProperty(variableName)) {
+          return GLOBAL_ENV[variableName];
+        }
+
+        return undefined;
       } catch (error) {
         return undefined;
       }
@@ -173,27 +175,19 @@ export default class JSXEvaluator {
 
   handleMemberExpression(node) {
     const objectFn = this.evaluate(node.object);
-    const propertyKey =
-      node.property.type === "Identifier"
-        ? node.property.value
-        : this.evaluate(node.property);
+    const propertyKey = node.computed
+      ? this.evaluate(node.property)
+      : () => node.property.value;
 
     return () => {
       try {
         const obj = objectFn();
 
-        if (obj == null) {
-          return undefined;
-        }
+        if (obj == null) return;
 
-        if (typeof obj !== "object" && typeof obj !== "function") {
-          return undefined;
-        }
-
-        const prop =
-          typeof propertyKey === "string"
-            ? obj[propertyKey]
-            : obj[propertyKey()];
+        const key =
+          typeof propertyKey === "function" ? propertyKey() : propertyKey;
+        const prop = obj[key];
 
         if (typeof prop === "function") {
           return prop.bind(obj);
@@ -201,20 +195,34 @@ export default class JSXEvaluator {
 
         return prop;
       } catch (error) {
-        return undefined;
+        return;
       }
     };
   }
 
   handleCallExpression(node) {
     const calleeFn = this.evaluate(node.callee);
+
     const argFunctions = node.arguments
       ? node.arguments.map((arg) => {
           if (arg.type === "SpreadElement") {
-            return this.evaluate(arg.expression);
+            return {
+              isSpread: true,
+              fn: this.evaluate(arg.argument),
+            };
           }
-          const actualArg = arg.expression || arg;
-          return this.evaluate(actualArg);
+          if (arg.spread !== undefined) {
+            const actualArg = arg.expression || arg;
+            return {
+              isSpread: arg.spread,
+              fn: this.evaluate(actualArg),
+            };
+          }
+
+          return {
+            isSpread: false,
+            fn: this.evaluate(arg),
+          };
         })
       : [];
 
@@ -222,28 +230,27 @@ export default class JSXEvaluator {
       try {
         const callee = calleeFn();
 
-        if (typeof callee !== "function") {
-          return undefined;
-        }
+        if (typeof callee !== "function") return;
 
         const args = [];
         for (let i = 0; i < argFunctions.length; i++) {
-          const argFn = argFunctions[i];
-          let argValue;
+          const { isSpread, fn } = argFunctions[i];
 
           try {
-            argValue = argFn();
-          } catch (error) {
-            argValue = undefined;
-          }
+            const argValue = fn();
 
-          args.push(argValue);
+            if (isSpread && Array.isArray(argValue)) {
+              args.push(...argValue);
+            } else {
+              args.push(argValue);
+            }
+          } catch (error) {}
         }
 
         const result = callee(...args);
         return result;
       } catch (error) {
-        return undefined;
+        return;
       }
     };
   }
@@ -257,14 +264,19 @@ export default class JSXEvaluator {
     return () => {
       try {
         const callee = calleeFn();
-        if (typeof callee !== "function") {
-          return undefined;
-        }
+        if (typeof callee !== "function") return;
 
-        const args = argFunctions.map((fn) => fn());
+        const args = argFunctions.map((fn) => {
+          try {
+            return fn();
+          } catch (error) {
+            return;
+          }
+        });
+
         return callee(...args);
       } catch (error) {
-        return undefined;
+        return;
       }
     };
   }
@@ -275,7 +287,11 @@ export default class JSXEvaluator {
     const alternateFn = this.evaluate(node.alternate);
 
     return () => {
-      return testFn() ? consequentFn() : alternateFn();
+      try {
+        return testFn() ? consequentFn() : alternateFn();
+      } catch (error) {
+        return;
+      }
     };
   }
 
@@ -284,20 +300,20 @@ export default class JSXEvaluator {
     const rightFn = this.evaluate(node.right);
 
     return () => {
-      const leftValue = leftFn();
-      switch (node.operator) {
-        case "&&":
-          if (leftValue) {
-            return rightFn();
-          } else {
+      try {
+        const leftValue = leftFn();
+        switch (node.operator) {
+          case "&&":
+            return leftValue && rightFn();
+          case "||":
+            return leftValue || rightFn();
+          case "??":
+            return leftValue ?? rightFn();
+          default:
             return false;
-          }
-        case "||":
-          return leftValue || rightFn();
-        case "??":
-          return leftValue ?? rightFn();
-        default:
-          return false;
+        }
+      } catch (error) {
+        return false;
       }
     };
   }
@@ -329,14 +345,18 @@ export default class JSXEvaluator {
     return () => {
       const children = node.children
         .map((child) => {
-          if (child.type === "JSXElement") {
-            return this.evaluate(child)();
-          } else if (child.type === "JSXExpressionContainer") {
-            return this.evaluate(child.expression)();
-          } else if (child.type === "JSXText") {
-            return child.value.trim();
+          try {
+            if (child.type === "JSXElement") {
+              return this.evaluate(child)();
+            } else if (child.type === "JSXExpressionContainer") {
+              return this.evaluate(child.expression)();
+            } else if (child.type === "JSXText") {
+              return child.value.trim();
+            }
+            return null;
+          } catch (error) {
+            return null;
           }
-          return null;
         })
         .filter(Boolean);
 
@@ -365,21 +385,23 @@ export default class JSXEvaluator {
     };
 
     attributes.forEach((attr) => {
-      const name = attr.name.value;
+      try {
+        const name = attr.name.value;
 
-      if (attr.value?.type === "JSXExpressionContainer") {
-        const binding = this.evaluate(attr.value.expression);
+        if (attr.value?.type === "JSXExpressionContainer") {
+          const binding = this.evaluate(attr.value.expression);
 
-        if (name.startsWith("on")) {
-          props.events[name.slice(2).toLowerCase()] = binding;
-        } else {
-          props.dynamic[name] = binding;
+          if (name.startsWith("on")) {
+            props.events[name.slice(2).toLowerCase()] = binding;
+          } else {
+            props.dynamic[name] = binding;
+          }
+        } else if (attr.value?.type === "StringLiteral") {
+          props.static[name] = attr.value.value;
+        } else if (!attr.value) {
+          props.static[name] = "";
         }
-      } else if (attr.value?.type === "StringLiteral") {
-        props.static[name] = attr.value.value;
-      } else if (!attr.value) {
-        props.static[name] = "";
-      }
+      } catch (error) {}
     });
 
     return props;
@@ -388,20 +410,27 @@ export default class JSXEvaluator {
   compileChildren(children) {
     return children
       .map((child) => {
-        if (child.type === "JSXText") {
-          return {
-            type: "text",
-            value: child.value.trim(),
-          };
-        } else if (child.type === "JSXExpressionContainer") {
-          return {
-            type: "expression",
-            binding: this.evaluate(child.expression),
-          };
-        } else if (child.type === "JSXElement") {
-          return this.compileJSXTemplate(child);
+        try {
+          if (child.type === "JSXText") {
+            const value = child.value.trim();
+            return value
+              ? {
+                  type: "text",
+                  value: value,
+                }
+              : null;
+          } else if (child.type === "JSXExpressionContainer") {
+            return {
+              type: "expression",
+              binding: this.evaluate(child.expression),
+            };
+          } else if (child.type === "JSXElement") {
+            return this.compileJSXTemplate(child);
+          }
+          return null;
+        } catch (error) {
+          return null;
         }
-        return null;
       })
       .filter(Boolean);
   }
@@ -423,31 +452,35 @@ export default class JSXEvaluator {
     );
 
     Object.entries(template.props.events).forEach(([event, binding]) => {
-      const handler = binding();
-      if (typeof handler === "function") {
-        element.addEventListener(event, handler);
-      }
+      try {
+        const handler = binding();
+        if (typeof handler === "function") {
+          element.addEventListener(event, handler);
+        }
+      } catch (error) {}
     });
 
     const childBindings = [];
     template.children.forEach((child, index) => {
-      if (child.type === "text") {
-        if (child.value) {
-          element.appendChild(document.createTextNode(child.value));
+      try {
+        if (child.type === "text") {
+          if (child.value) {
+            element.appendChild(document.createTextNode(child.value));
+          }
+        } else if (child.type === "expression") {
+          const anchor = document.createComment(`child-${index}`);
+          element.appendChild(anchor);
+          childBindings.push({
+            type: "content",
+            anchor,
+            binding: child.binding,
+          });
+        } else if (child.type === "jsx-template") {
+          const childResult = this.createElementFromTemplate(child);
+          element.appendChild(childResult.element);
+          childBindings.push(...childResult.bindings);
         }
-      } else if (child.type === "expression") {
-        const anchor = document.createComment(`child-${index}`);
-        element.appendChild(anchor);
-        childBindings.push({
-          type: "content",
-          anchor,
-          binding: child.binding,
-        });
-      } else if (child.type === "jsx-template") {
-        const childResult = this.createElementFromTemplate(child);
-        element.appendChild(childResult.element);
-        childBindings.push(...childResult.bindings);
-      }
+      } catch (error) {}
     });
 
     return {
@@ -468,9 +501,13 @@ export default class JSXEvaluator {
     };
 
     return () => {
-      const value = argumentFn();
-      const operation = operators[node.operator];
-      return operation ? operation(value) : value;
+      try {
+        const value = argumentFn();
+        const operation = operators[node.operator];
+        return operation ? operation(value) : value;
+      } catch (error) {
+        return;
+      }
     };
   }
 
@@ -478,13 +515,12 @@ export default class JSXEvaluator {
     const leftFn = this.evaluate(node.left);
     const rightFn = this.evaluate(node.right);
 
-    // 處理邏輯運算符（當被解析為BinaryExpression時）
     if (node.operator === "&&") {
       return () => {
-        const leftValue = leftFn();
-        if (leftValue) {
-          return rightFn();
-        } else {
+        try {
+          const leftValue = leftFn();
+          return leftValue && rightFn();
+        } catch (error) {
           return false;
         }
       };
@@ -492,8 +528,12 @@ export default class JSXEvaluator {
 
     if (node.operator === "||") {
       return () => {
-        const leftValue = leftFn();
-        return leftValue || rightFn();
+        try {
+          const leftValue = leftFn();
+          return leftValue || rightFn();
+        } catch (error) {
+          return false;
+        }
       };
     }
 
@@ -511,33 +551,53 @@ export default class JSXEvaluator {
       "<": (l, r) => l < r,
       ">=": (l, r) => l >= r,
       "<=": (l, r) => l <= r,
+      "|": (l, r) => l | r,
+      "&": (l, r) => l & r,
+      "^": (l, r) => l ^ r,
+      "<<": (l, r) => l << r,
+      ">>": (l, r) => l >> r,
+      ">>>": (l, r) => l >>> r,
     };
 
     return () => {
-      const left = leftFn();
-      const right = rightFn();
-      const operation = operators[node.operator];
-      return operation ? operation(left, right) : undefined;
+      try {
+        const left = leftFn();
+        const right = rightFn();
+        const operation = operators[node.operator];
+        return operation ? operation(left, right) : undefined;
+      } catch (error) {
+        return;
+      }
     };
   }
 
   handleAssignmentExpression(node) {
     const rightFn = this.evaluate(node.right);
-    return () => rightFn();
+    return () => {
+      try {
+        return rightFn();
+      } catch (error) {
+        return;
+      }
+    };
   }
 
   handleUpdateExpression(node) {
     const argumentFn = this.evaluate(node.argument);
 
     return () => {
-      const current = argumentFn();
-      switch (node.operator) {
-        case "++":
-          return node.prefix ? current + 1 : current;
-        case "--":
-          return node.prefix ? current - 1 : current;
-        default:
-          return current;
+      try {
+        const current = argumentFn();
+        switch (node.operator) {
+          case "++":
+            return node.prefix ? current + 1 : current;
+          case "--":
+            return node.prefix ? current - 1 : current;
+          default:
+            return current;
+        }
+      } catch (error) {
+        return;
       }
     };
   }
@@ -547,18 +607,26 @@ export default class JSXEvaluator {
       .filter((prop) => prop.type === "ObjectProperty")
       .map((prop) => ({
         keyFn:
-          prop.key.type === "Identifier"
+          prop.key.type === "Identifier" && !prop.computed
             ? () => prop.key.value
             : this.evaluate(prop.key),
         valueFn: this.evaluate(prop.value),
       }));
 
     return () => {
-      const obj = {};
-      propertyFunctions.forEach(({ keyFn, valueFn }) => {
-        obj[keyFn()] = valueFn();
-      });
-      return obj;
+      try {
+        const obj = {};
+        propertyFunctions.forEach(({ keyFn, valueFn }) => {
+          try {
+            const key = keyFn();
+            const value = valueFn();
+            obj[key] = value;
+          } catch (error) {}
+        });
+        return obj;
+      } catch (error) {
+        return {};
+      }
     };
   }
 
@@ -571,25 +639,39 @@ export default class JSXEvaluator {
     });
 
     return () => {
-      return elementFunctions.map((fn) => fn());
+      try {
+        return elementFunctions.map((fn) => {
+          try {
+            return fn();
+          } catch (error) {
+            return;
+          }
+        });
+      } catch (error) {
+        return [];
+      }
     };
   }
 
   handleSpreadElement(node) {
-    const argumentFn = this.evaluate(node.expression);
+    const argumentFn = this.evaluate(node.argument);
 
     return () => {
-      const value = argumentFn();
+      try {
+        const value = argumentFn();
 
-      if (Array.isArray(value)) {
-        return value;
+        if (Array.isArray(value)) {
+          return value;
+        }
+
+        if (typeof value === "function") {
+          return value;
+        }
+
+        return [value];
+      } catch (error) {
+        return [];
       }
-
-      if (typeof value === "function") {
-        return value;
-      }
-
-      return [value];
     };
   }
 
@@ -644,7 +726,7 @@ export default class JSXEvaluator {
 
           return result;
         } catch (error) {
-          return undefined;
+          return;
         }
       };
 
@@ -662,14 +744,18 @@ export default class JSXEvaluator {
 
     return () => {
       const fn = (...args) => {
-        const newContext = { ...this.context };
-        paramNames.forEach((paramName, index) => {
-          newContext[paramName] = args[index];
-        });
+        try {
+          const newContext = { ...this.context };
+          paramNames.forEach((paramName, index) => {
+            newContext[paramName] = args[index];
+          });
 
-        const evaluator = new JSXEvaluator(newContext);
-        const bodyFn = evaluator.evaluate(node.body);
-        return bodyFn();
+          const evaluator = new JSXEvaluator(newContext);
+          const bodyFn = evaluator.evaluate(node.body);
+          return bodyFn();
+        } catch (error) {
+          return undefined;
+        }
       };
 
       if (node.id && node.id.value) {
@@ -691,15 +777,19 @@ export default class JSXEvaluator {
     );
 
     return () => {
-      let result = "";
-      for (let i = 0; i < quasisFunctions.length; i++) {
-        result += quasisFunctions[i]();
-        if (i < expressionFunctions.length) {
-          const exprValue = expressionFunctions[i]();
-          result += exprValue != null ? String(exprValue) : "";
+      try {
+        let result = "";
+        for (let i = 0; i < quasisFunctions.length; i++) {
+          result += quasisFunctions[i]();
+          if (i < expressionFunctions.length) {
+            const exprValue = expressionFunctions[i]();
+            result += exprValue != null ? String(exprValue) : "";
+          }
         }
+        return result;
+      } catch (error) {
+        return "";
       }
-      return result;
     };
   }
 
@@ -708,13 +798,17 @@ export default class JSXEvaluator {
     const templateFn = this.evaluate(node.quasi);
 
     return () => {
-      const tag = tagFn();
-      const template = templateFn();
+      try {
+        const tag = tagFn();
+        const template = templateFn();
 
-      if (typeof tag === "function") {
-        return tag(template);
+        if (typeof tag === "function") {
+          return tag(template);
+        }
+        return template;
+      } catch (error) {
+        return "";
       }
-      return template;
     };
   }
 
@@ -724,11 +818,15 @@ export default class JSXEvaluator {
     );
 
     return () => {
-      let result;
-      expressionFunctions.forEach((fn) => {
-        result = fn();
-      });
-      return result;
+      try {
+        let result;
+        expressionFunctions.forEach((fn) => {
+          result = fn();
+        });
+        return result;
+      } catch (error) {
+        return;
+      }
     };
   }
 
@@ -739,13 +837,23 @@ export default class JSXEvaluator {
       : [];
 
     return () => {
-      const Constructor = calleeFn();
-      const args = argFunctions.map((fn) => fn());
+      try {
+        const Constructor = calleeFn();
+        const args = argFunctions.map((fn) => {
+          try {
+            return fn();
+          } catch (error) {
+            return;
+          }
+        });
 
-      if (typeof Constructor === "function") {
-        return new Constructor(...args);
+        if (typeof Constructor === "function") {
+          return new Constructor(...args);
+        }
+        throw new Error("Constructor is not a function");
+      } catch (error) {
+        return;
       }
-      throw new Error("Constructor is not a function");
     };
   }
 
@@ -753,11 +861,15 @@ export default class JSXEvaluator {
     const statementFns = node.body.map((stmt) => this.evaluate(stmt));
 
     return () => {
-      let result;
-      statementFns.forEach((fn) => {
-        result = fn();
-      });
-      return result;
+      try {
+        let result;
+        statementFns.forEach((fn) => {
+          result = fn();
+        });
+        return result;
+      } catch (error) {
+        return;
+      }
     };
   }
 }

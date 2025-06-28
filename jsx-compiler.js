@@ -1,10 +1,12 @@
 import { parseSync } from "@swc/core";
-
 import fs from "fs";
 import chokidar from "chokidar";
+import transformPOToFC from "./utils/transformPOToFC.js";
 
 function compileJSX(jsxContent) {
-  const jsxAST = parseSync(jsxContent, {
+  const preprocessedContent = transformPOToFC(jsxContent);
+
+  const jsxAST = parseSync(preprocessedContent, {
     syntax: "ecmascript",
     jsx: true,
   });
@@ -12,10 +14,11 @@ function compileJSX(jsxContent) {
   const compiledData = `
 export const jsxAST = ${JSON.stringify(jsxAST, null, 2)};
 export const lastCompiled = ${Date.now()};
+export const originalContent = ${JSON.stringify(jsxContent)};
+export const preprocessedContent = ${JSON.stringify(preprocessedContent)};
 `;
 
   fs.writeFileSync("./compiled-template.js", compiledData);
-  console.log(`✅ 模板已重新編譯 ${new Date().toLocaleTimeString()}`);
 }
 
 const watcher = chokidar.watch("./src/template.jsx", {
@@ -29,3 +32,9 @@ watcher.on("change", (filePath) => {
 });
 
 console.log("🔍 開始監聽 JSX 文件變化...");
+
+// 初始編譯
+if (fs.existsSync("./src/template.jsx")) {
+  const jsxContent = fs.readFileSync("./src/template.jsx", "utf8");
+  compileJSX(jsxContent);
+}

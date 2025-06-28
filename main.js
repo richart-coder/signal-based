@@ -1,50 +1,94 @@
 import generateReactiveTemplate from "./src/generateReactiveTemplate.js";
 import signal, { computed } from "./signal.js";
 
-const count = signal(0);
-const nameInput = signal("");
-const names = signal([]);
+// 狀態
+const volumeRatio = signal(0.847);
+const price = signal(1234.56);
+const temperature = signal(25.7);
+const userName = signal("john_doe");
+const tempUnit = signal("C");
 
-const isAddDisabled = computed(() => nameInput().trim().length === 0);
-const totalNames = computed(() => names().length);
+// 簡化的 Pipe 函數
+const percent = (value) => `${(value * 100).toFixed(2)}%`;
+const formatCurrency = (value) => `$${value.toFixed(2)}`;
+const addSymbol = (str) => `💰 ${str}`;
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+const addPrefix = (str) => `用戶: ${str}`;
+const formatUser = (str) => str.replace(/_/g, " ");
 
-const handleIncrement = () => count.set(count() + 1);
-const handleDecrement = () => count.set(count() - 1);
-const handleReset = () => count.set(0);
-
-const handleNameInput = (e) => nameInput.set(e.target.value);
-const handleAddName = () => {
-  const name = nameInput().trim();
-  if (!name) return;
-  names.set([...names(), name]);
-  nameInput.set("");
+// 溫度函數
+const celsius = (temp) => `${temp.toFixed(1)}°C`;
+const fahrenheit = (temp) => `${temp.toFixed(1)}°F`;
+const toFahrenheit = (celsius) => (celsius * 9) / 5 + 32;
+const toCelsius = (fahrenheit) => ((fahrenheit - 32) * 5) / 9;
+const smartTemp = (temp, unit = "C") => {
+  return unit.toUpperCase() === "F"
+    ? `${temp.toFixed(1)}°F`
+    : `${temp.toFixed(1)}°C`;
 };
 
-const handleDeleteName = (index) => {
-  const newList = names().slice();
-  newList.splice(index, 1);
-  names.set(newList);
-};
+// 計算屬性
+const formattedVolume = computed(() => percent(volumeRatio()));
+const formattedPrice = computed(() => addSymbol(formatCurrency(price())));
+const tempDisplay = computed(() => {
+  const unit = tempUnit();
+  return unit === "F"
+    ? fahrenheit(toFahrenheit(temperature()))
+    : celsius(temperature());
+});
+const userDisplay = computed(() =>
+  addPrefix(capitalize(formatUser(userName())))
+);
+
+// 事件處理
+const handleVolumeChange = (e) =>
+  volumeRatio.set(parseFloat(e.target.value) || 0);
+const handlePriceChange = (e) => price.set(parseFloat(e.target.value) || 0);
+const handleTempChange = (e) =>
+  temperature.set(parseFloat(e.target.value) || 0);
+const handleUserChange = (e) => userName.set(e.target.value);
+const handleUnitToggle = () => tempUnit.set(tempUnit() === "C" ? "F" : "C");
 
 const context = {
-  count,
-  nameInput,
-  names,
-  isAddDisabled,
-  totalNames,
-  handleIncrement,
-  handleDecrement,
-  handleReset,
-  handleNameInput,
-  handleAddName,
-  handleDeleteName,
+  volumeRatio,
+  price,
+  temperature,
+  userName,
+  tempUnit,
+  formattedVolume,
+  formattedPrice,
+  tempDisplay,
+  userDisplay,
+  percent,
+  formatCurrency,
+  addSymbol,
+  celsius,
+  fahrenheit,
+  toFahrenheit,
+  toCelsius,
+  smartTemp,
+  capitalize,
+  addPrefix,
+  formatUser,
+  handleVolumeChange,
+  handlePriceChange,
+  handleTempChange,
+  handleUserChange,
+  handleUnitToggle,
 };
 
 async function loadAndMount() {
-  const { jsxAST } = await import(`./compiled-template.js?t=${Date.now()}`);
-  const template = generateReactiveTemplate(jsxAST.body[0].expression, context);
-  const app = document.getElementById("app");
-  template.mount(app);
+  try {
+    const { jsxAST } = await import(`./compiled-template.js?t=${Date.now()}`);
+    const template = generateReactiveTemplate(
+      jsxAST.body[0].expression,
+      context
+    );
+    const app = document.getElementById("app");
+    template.mount(app);
+  } catch (error) {
+    console.error("載入或掛載失敗:", error);
+  }
 }
 
 loadAndMount();
