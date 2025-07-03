@@ -64,49 +64,32 @@ class DynamicContentManager {
         (a) => a.name.value === "key"
       );
 
+      if (keyAttr?.value?.type === "StringLiteral") {
+        return keyAttr.value.value;
+      }
+
       if (keyAttr?.value?.type === "JSXExpressionContainer") {
         try {
           const evaluator = new JSXEvaluator(
             item._boundContext || this.context
           );
           const result = evaluator.evaluate(keyAttr.value.expression);
-          const keyVal = result.binding();
-          return keyVal != null ? String(keyVal) : `auto-${index}`;
-        } catch {
-          return `auto-${index}`;
-        }
+          const keyVal = result?.binding?.() ?? result;
+
+          if (keyVal != null) {
+            return String(keyVal);
+          }
+        } catch (err) {}
+
+        console.warn("每個清單中的子元素都應該有一個唯一且穩定的 'key' 屬性。");
+
+        return `auto-${index}`;
       }
 
-      if (keyAttr?.value?.type === "StringLiteral") {
-        return keyAttr.value.value;
-      }
-
-      return `jsx-${this.hashContent(item)}`;
-    }
-
-    if (typeof item === "string" || typeof item === "number") {
-      // 對於純文本/數字內容，使用更智能的key策略
-      const content = String(item);
-
-      // 如果是純數字或包含數字的字符串，使用類型作為key
-      if (/^[\d.,\s$€¥£]+$/.test(content)) {
-        return `number-content-${index}`;
-      }
-      // 如果包含購物車圖標等固定模式
-      else if (content.includes("🛒") || content.includes("結帳")) {
-        return `checkout-button-${index}`;
-      }
-      // 其他文本內容
-      else {
-        return `content-${item}`;
-      }
+      return `auto-${index}`;
     }
 
     return `auto-${index}`;
-  }
-
-  hashContent(obj) {
-    return JSON.stringify(obj).slice(0, 8);
   }
 
   calculateDiff(oldKeys, newKeys, oldItems, newItems) {
