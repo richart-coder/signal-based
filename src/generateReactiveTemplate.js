@@ -82,7 +82,6 @@ class DynamicContentManager {
         } catch (err) {}
       }
     }
-    console.warn("每個清單中的子元素都應該有一個唯一且穩定的 'key' 屬性。");
     return `auto-${index}`;
   }
 
