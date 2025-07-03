@@ -16,10 +16,344 @@ const ATTR_MAP = new Map([
 
 const FALSY_VALUES = new Set([null, undefined, false, ""]);
 
+class DynamicContentManager {
+  constructor(anchor, parentElement, compileElementFn, context) {
+    this.anchor = anchor;
+    this.parentElement = parentElement;
+    this.compileElement = compileElementFn;
+    this.context = context;
+
+    this.elementCache = new Map();
+    this.currentItems = [];
+    this.currentKeys = [];
+  }
+
+  update(newValue) {
+    const newItems = this.normalize(newValue);
+
+    const newKeys = newItems.map((item, index) =>
+      this.generateKey(item, index)
+    );
+
+    const diff = this.calculateDiff(
+      this.currentKeys,
+      newKeys,
+      this.currentItems,
+      newItems
+    );
+
+    this.applyChanges(diff);
+
+    this.currentItems = newItems;
+    this.currentKeys = newKeys;
+  }
+
+  normalize(value) {
+    if (FALSY_VALUES.has(value)) return [];
+
+    if (Array.isArray(value)) {
+      return value.filter((item) => !FALSY_VALUES.has(item));
+    }
+
+    return [value];
+  }
+
+  generateKey(item, index) {
+    if (typeof item === "object" && item?.type === "JSXElement") {
+      const keyAttr = item.opening?.attributes?.find(
+        (a) => a.name.value === "key"
+      );
+
+      if (keyAttr?.value?.type === "JSXExpressionContainer") {
+        try {
+          const evaluator = new JSXEvaluator(
+            item._boundContext || this.context
+          );
+          const result = evaluator.evaluate(keyAttr.value.expression);
+          const keyVal = result.binding();
+          return keyVal != null ? String(keyVal) : `auto-${index}`;
+        } catch {
+          return `auto-${index}`;
+        }
+      }
+
+      if (keyAttr?.value?.type === "StringLiteral") {
+        return keyAttr.value.value;
+      }
+
+      return `jsx-${this.hashContent(item)}`;
+    }
+
+    if (typeof item === "string" || typeof item === "number") {
+      // 對於純文本/數字內容，使用更智能的key策略
+      const content = String(item);
+
+      // 如果是純數字或包含數字的字符串，使用類型作為key
+      if (/^[\d.,\s$€¥£]+$/.test(content)) {
+        return `number-content-${index}`;
+      }
+      // 如果包含購物車圖標等固定模式
+      else if (content.includes("🛒") || content.includes("結帳")) {
+        return `checkout-button-${index}`;
+      }
+      // 其他文本內容
+      else {
+        return `content-${item}`;
+      }
+    }
+
+    return `auto-${index}`;
+  }
+
+  hashContent(obj) {
+    return JSON.stringify(obj).slice(0, 8);
+  }
+
+  calculateDiff(oldKeys, newKeys, oldItems, newItems) {
+    const toRemove = [];
+    const toAdd = [];
+    const toUpdate = [];
+    const toMove = [];
+
+    oldKeys.forEach((key, index) => {
+      if (!newKeys.includes(key)) {
+        toRemove.push({ key, index });
+      }
+    });
+
+    newKeys.forEach((key, newIndex) => {
+      const oldIndex = oldKeys.indexOf(key);
+
+      if (oldIndex === -1) {
+        toAdd.push({
+          key,
+          item: newItems[newIndex],
+          index: newIndex,
+        });
+      } else {
+        if (this.shouldUpdateContent(oldItems[oldIndex], newItems[newIndex])) {
+          toUpdate.push({
+            key,
+            oldItem: oldItems[oldIndex],
+            newItem: newItems[newIndex],
+            index: newIndex,
+          });
+        }
+
+        if (oldIndex !== newIndex) {
+          toMove.push({
+            key,
+            from: oldIndex,
+            to: newIndex,
+          });
+        }
+      }
+    });
+
+    return { toRemove, toAdd, toUpdate, toMove };
+  }
+
+  shouldUpdateContent(oldItem, newItem) {
+    if (typeof oldItem !== typeof newItem) return true;
+
+    if (typeof oldItem !== "object" || oldItem === null) {
+      return oldItem !== newItem;
+    }
+
+    if (oldItem?.type === "JSXElement" && newItem?.type === "JSXElement") {
+      const oldTag = oldItem.opening?.name?.value;
+      const newTag = newItem.opening?.name?.value;
+      if (oldTag !== newTag) return true;
+
+      const oldAttrs = oldItem.opening?.attributes || [];
+      const newAttrs = newItem.opening?.attributes || [];
+      if (oldAttrs.length !== newAttrs.length) return true;
+
+      for (let i = 0; i < oldAttrs.length; i++) {
+        const oldAttr = oldAttrs[i];
+        const newAttr = newAttrs[i];
+        if (
+          oldAttr?.name?.value !== newAttr?.name?.value ||
+          oldAttr?.value?.value !== newAttr?.value?.value
+        ) {
+          return true;
+        }
+      }
+
+      const oldChildren = oldItem.children || [];
+      const newChildren = newItem.children || [];
+      if (oldChildren.length !== newChildren.length) return true;
+
+      for (let i = 0; i < oldChildren.length; i++) {
+        const oldChild = oldChildren[i];
+        const newChild = newChildren[i];
+        if (oldChild?.type !== newChild?.type) return true;
+      }
+
+      return false;
+    }
+
+    return true;
+  }
+
+  applyChanges(diff) {
+    diff.toRemove.forEach(({ key }) => {
+      const cached = this.elementCache.get(key);
+      if (cached) {
+        if (cached.dispose) cached.dispose();
+
+        if (cached.element.parentNode) {
+          cached.element.parentNode.removeChild(cached.element);
+        }
+
+        this.elementCache.delete(key);
+      }
+    });
+
+    diff.toAdd.forEach(({ key, item, index }) => {
+      const { element, dispose } = this.createElement(item);
+      this.elementCache.set(key, { element, dispose });
+      this.insertElementAt(element, index);
+    });
+
+    diff.toUpdate.forEach(({ key, newItem }) => {
+      const cached = this.elementCache.get(key);
+      if (cached) {
+        if (cached.dispose) cached.dispose();
+
+        const { element: newElement, dispose: newDispose } =
+          this.createElement(newItem);
+
+        if (cached.element.parentNode) {
+          cached.element.parentNode.replaceChild(newElement, cached.element);
+        }
+
+        this.elementCache.set(key, {
+          element: newElement,
+          dispose: newDispose,
+        });
+      }
+    });
+
+    diff.toMove.forEach(({ key, to }) => {
+      const cached = this.elementCache.get(key);
+      if (cached) {
+        this.moveElementTo(cached.element, to);
+      }
+    });
+  }
+
+  createElement(item) {
+    let element;
+    let dispose = null;
+
+    if (typeof item === "object" && item?.type === "JSXElement") {
+      element = this.compileElement(item, item._boundContext || this.context);
+
+      dispose = () => {
+        if (element._effectCleanups) {
+          element._effectCleanups.forEach((cleanup) => cleanup());
+          element._effectCleanups = [];
+        }
+
+        this.cleanupElementEffects(element);
+      };
+    } else if (typeof item === "string" && item.includes("<")) {
+      const temp = document.createElement("template");
+      temp.innerHTML = item;
+      const nodes = Array.from(temp.content.childNodes);
+
+      if (nodes.length === 1) {
+        element = nodes[0];
+      } else {
+        element = document.createDocumentFragment();
+        nodes.forEach((node) => element.appendChild(node));
+      }
+    } else {
+      element = document.createTextNode(String(item));
+    }
+
+    if (element.nodeType === Node.ELEMENT_NODE) {
+      element._dynamic = true;
+    }
+
+    return { element, dispose };
+  }
+
+  cleanupElementEffects(element) {
+    if (element.nodeType !== Node.ELEMENT_NODE) return;
+
+    if (element._effectCleanups) {
+      element._effectCleanups.forEach((cleanup) => cleanup());
+      element._effectCleanups = [];
+    }
+
+    if (element._dynamicContentManager) {
+      element._dynamicContentManager.cleanup();
+      element._dynamicContentManager = null;
+    }
+
+    Array.from(element.children).forEach((child) => {
+      this.cleanupElementEffects(child);
+    });
+  }
+
+  updateElement(element, newItem) {
+    if (element.nodeType === Node.TEXT_NODE) {
+      element.textContent = String(newItem);
+      return element;
+    }
+
+    if (typeof newItem === "object" && newItem?.type === "JSXElement") {
+      this.cleanupElementEffects(element);
+      const newElement = this.compileElement(
+        newItem,
+        newItem._boundContext || this.context
+      );
+      if (element.parentNode) {
+        element.parentNode.replaceChild(newElement, element);
+      }
+      return newElement;
+    }
+
+    return element;
+  }
+
+  insertElementAt(element, index) {
+    let targetSibling = this.anchor.nextSibling;
+    let currentIndex = 0;
+
+    while (targetSibling && targetSibling._dynamic && currentIndex < index) {
+      targetSibling = targetSibling.nextSibling;
+      currentIndex++;
+    }
+
+    this.parentElement.insertBefore(element, targetSibling);
+  }
+
+  moveElementTo(element, targetIndex) {
+    element.parentNode?.removeChild(element);
+
+    this.insertElementAt(element, targetIndex);
+  }
+
+  cleanup() {
+    this.elementCache.forEach(({ element, dispose }) => {
+      if (dispose) dispose();
+      if (element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+    });
+
+    this.elementCache.clear();
+    this.currentItems = [];
+    this.currentKeys = [];
+  }
+}
+
 export default function generateReactiveTemplate(jsxAST, context) {
-  function createBinding(expression, ctx) {
-    const evaluator = new JSXEvaluator(ctx);
-    return evaluator.evaluate(expression);
+  function createEvaluator(ctx) {
+    return new JSXEvaluator(ctx);
   }
 
   function setAttr(el, name, value, syncProp = true) {
@@ -43,26 +377,35 @@ export default function generateReactiveTemplate(jsxAST, context) {
     const tag = node.opening.name.value;
     const el = document.createElement(tag);
 
+    const evaluator = createEvaluator(ctx);
+
+    el._effectCleanups = [];
+
     node.opening.attributes.forEach((attr) => {
       const attrName = ATTR_MAP.get(attr.name.value) ?? attr.name.value;
 
       if (attr.value?.type === "JSXExpressionContainer") {
-        const binding = createBinding(attr.value.expression, ctx);
+        const result = evaluator.evaluate(attr.value.expression);
 
         if (attrName.startsWith("on")) {
           const eventName = attrName.slice(2).toLowerCase();
           const handler = (e) => {
-            const fn = binding();
+            const fn = result.binding();
             if (typeof fn === "function") fn(e);
           };
           el.addEventListener(eventName, handler);
           if (!el._handlers) el._handlers = {};
           el._handlers[eventName] = handler;
-        } else {
-          effect(() => {
-            const val = binding();
+        } else if (result.isReactive) {
+          const cleanup = effect(() => {
+            const val = result.binding();
+
             queueMicrotask(() => setAttr(el, attrName, val));
           });
+          el._effectCleanups.push(cleanup);
+        } else {
+          const val = result.binding();
+          setAttr(el, attrName, val);
         }
       } else if (attr.value?.type === "StringLiteral") {
         setAttr(el, attrName, attr.value.value);
@@ -76,43 +419,30 @@ export default function generateReactiveTemplate(jsxAST, context) {
         const text = child.value.trim();
         if (text) el.appendChild(document.createTextNode(text));
       } else if (child.type === "JSXExpressionContainer") {
-        const binding = createBinding(child.expression, ctx);
-        const initialVal = binding();
+        const result = evaluator.evaluate(child.expression);
 
-        if (typeof initialVal === "string" || typeof initialVal === "number") {
-          const textNode = document.createTextNode(String(initialVal));
-          el.appendChild(textNode);
-          effect(() => {
-            textNode.textContent = String(binding());
+        const anchor = document.createComment("dynamic");
+        el.appendChild(anchor);
+
+        const contentManager = new DynamicContentManager(
+          anchor,
+          el,
+          compileElement,
+          ctx
+        );
+
+        if (result.isReactive) {
+          const cleanup = effect(() => {
+            const val = result.binding();
+            contentManager.update(val);
           });
+          el._effectCleanups.push(cleanup);
         } else {
-          const anchor = document.createComment("dynamic");
-          el.appendChild(anchor);
-
-          let prevVal = null;
-          let currentNodes = null;
-          const itemNodes = new Map();
-
-          effect(() => {
-            const val = binding();
-            if (Array.isArray(val)) {
-              if (!Array.isArray(prevVal)) clearNodesAfter(anchor);
-              renderList(val, anchor, itemNodes, prevVal);
-              prevVal = val.slice();
-            } else {
-              if (Array.isArray(prevVal)) itemNodes.clear();
-              const nodes = renderNode(val);
-              if (shouldUpdate(currentNodes, nodes, val, prevVal)) {
-                clearNodesAfter(anchor);
-                insertNodes(nodes, anchor, el);
-                currentNodes = nodes;
-                prevVal = val;
-              } else {
-                prevVal = val;
-              }
-            }
-          });
+          const val = result.binding();
+          contentManager.update(val);
         }
+
+        el._dynamicContentManager = contentManager;
       } else if (child.type === "JSXElement") {
         const childEl = compileElement(child, ctx);
         el.appendChild(childEl);
@@ -120,171 +450,6 @@ export default function generateReactiveTemplate(jsxAST, context) {
     });
 
     return el;
-  }
-
-  function renderNode(val) {
-    if (FALSY_VALUES.has(val)) return [];
-    if (Array.isArray(val)) return val.flatMap(renderNode);
-    if (typeof val === "object" && val?.type === "JSXElement") {
-      return [compileElement(val, val._boundContext || context)];
-    }
-    if (typeof val === "string" && val.includes("<")) {
-      const temp = document.createElement("template");
-      temp.innerHTML = val;
-      return Array.from(temp.content.childNodes);
-    }
-    return [document.createTextNode(String(val))];
-  }
-
-  function shouldUpdate(currNodes, newNodes, currVal, prevVal) {
-    if (currNodes === null) return true;
-    if (typeof currVal !== typeof prevVal) return true;
-
-    if (
-      typeof currVal === "object" &&
-      currVal &&
-      prevVal &&
-      currVal.type === "JSXElement" &&
-      prevVal.type === "JSXElement"
-    ) {
-      return currVal.opening?.name?.value !== prevVal.opening?.name?.value;
-    }
-    return currVal !== prevVal;
-  }
-
-  function renderList(items, anchor, itemNodes, prevItems) {
-    const keys = new Set(items.map(getKey));
-    itemNodes.forEach((nodeInfo, key) => {
-      if (!keys.has(key)) {
-        nodeInfo.cleanup?.forEach((fn) => fn());
-        nodeInfo.element.parentNode?.removeChild(nodeInfo.element);
-        itemNodes.delete(key);
-      }
-    });
-
-    items.forEach((item, idx) => {
-      const key = getKey(item, idx);
-      const isNew = !itemNodes.has(key);
-
-      if (isNew) {
-        const el = createItem(item);
-        itemNodes.set(key, { element: el, cleanup: [] });
-        insertAt(el, anchor, idx);
-      } else {
-        const nodeInfo = itemNodes.get(key);
-        if (!updateItem(nodeInfo.element, item)) {
-          nodeInfo.element.parentNode?.removeChild(nodeInfo.element);
-          const el = createItem(item);
-          itemNodes.set(key, { element: el, cleanup: [] });
-          insertAt(el, anchor, idx);
-        } else {
-          if (getPosition(nodeInfo.element, anchor) !== idx) {
-            insertAt(nodeInfo.element, anchor, idx);
-          }
-        }
-      }
-    });
-  }
-
-  function getKey(item, idx) {
-    if (typeof item === "object" && item?.type === "JSXElement") {
-      const keyAttr = item.opening?.attributes?.find(
-        (a) => a.name.value === "key"
-      );
-      if (keyAttr?.value?.type === "JSXExpressionContainer") {
-        const ctx = item._boundContext || context;
-        const binding = new JSXEvaluator(ctx).evaluate(
-          keyAttr.value.expression
-        );
-        const keyVal = binding();
-        return keyVal != null ? String(keyVal) : `index-${idx}`;
-      }
-      if (keyAttr?.value?.type === "StringLiteral") return keyAttr.value.value;
-    }
-    if (item?._boundContext?.todo?.id)
-      return String(item._boundContext.todo.id);
-    return `index-${idx}`;
-  }
-
-  function createItem(item) {
-    if (typeof item === "object" && item?.type === "JSXElement") {
-      return compileElement(item, item._boundContext || context);
-    }
-    return document.createTextNode(String(item));
-  }
-
-  function updateItem(el, item) {
-    if (typeof item === "object" && item?.type === "JSXElement") {
-      rebindHandlers(el, item, item._boundContext || context);
-      return true;
-    }
-    return false;
-  }
-
-  function rebindHandlers(el, jsxItem, ctx) {
-    jsxItem.opening?.attributes?.forEach((attr) => {
-      const attrName = ATTR_MAP.get(attr.name.value) ?? attr.name.value;
-      if (
-        attrName.startsWith("on") &&
-        attr.value?.type === "JSXExpressionContainer"
-      ) {
-        const eventName = attrName.slice(2).toLowerCase();
-        const oldHandler = el._handlers?.[eventName];
-        if (oldHandler) el.removeEventListener(eventName, oldHandler);
-
-        const binding = new JSXEvaluator(ctx).evaluate(attr.value.expression);
-        const newHandler = (e) => {
-          const fn = binding();
-          if (typeof fn === "function") fn(e);
-        };
-        el.addEventListener(eventName, newHandler);
-        if (!el._handlers) el._handlers = {};
-        el._handlers[eventName] = newHandler;
-      }
-    });
-
-    jsxItem.children?.forEach((child, i) => {
-      if (child.type === "JSXElement" && el.children[i]) {
-        rebindHandlers(el.children[i], child, ctx);
-      }
-    });
-  }
-
-  function insertAt(el, anchor, idx) {
-    el._dynamic = true;
-    let sibling = anchor.nextSibling;
-    let pos = 0;
-    while (sibling && sibling._dynamic && pos < idx) {
-      sibling = sibling.nextSibling;
-      pos++;
-    }
-    anchor.parentNode.insertBefore(el, sibling);
-  }
-
-  function getPosition(el, anchor) {
-    let curr = anchor.nextSibling;
-    let pos = 0;
-    while (curr && curr !== el) {
-      if (curr._dynamic) pos++;
-      curr = curr.nextSibling;
-    }
-    return curr === el ? pos : -1;
-  }
-
-  function clearNodesAfter(anchor) {
-    let next = anchor.nextSibling;
-    while (next && next._dynamic) {
-      const toRemove = next;
-      next = next.nextSibling;
-      toRemove.parentNode?.removeChild(toRemove);
-    }
-  }
-
-  function insertNodes(nodes, anchor, parent) {
-    nodes.forEach((node) => {
-      node._dynamic = true;
-      parent.insertBefore(node, anchor.nextSibling);
-    });
   }
 
   function compileModule(ast) {
@@ -298,7 +463,7 @@ export default function generateReactiveTemplate(jsxAST, context) {
       }
     }
     if (ast.type === "JSXElement") return compileElement(ast);
-    throw new Error(`Invalid AST type: ${ast.type}`);
+    throw new Error(`無效的 AST 類型: ${ast.type}`);
   }
 
   return {
@@ -307,6 +472,19 @@ export default function generateReactiveTemplate(jsxAST, context) {
       container.appendChild(root);
     },
     cleanup(container) {
+      const elementsWithEffects = container.querySelectorAll("*");
+      elementsWithEffects.forEach((el) => {
+        if (el._effectCleanups) {
+          el._effectCleanups.forEach((cleanup) => cleanup());
+          el._effectCleanups = [];
+        }
+
+        if (el._dynamicContentManager) {
+          el._dynamicContentManager.cleanup();
+          el._dynamicContentManager = null;
+        }
+      });
+
       container.innerHTML = "";
     },
   };

@@ -31,12 +31,14 @@ function signal(initialState) {
     subsToRun.forEach((sub) => sub());
   };
 
+  signalFn.isSignal = true;
+
   return signalFn;
 }
 
 function computed(callback) {
   const resultSignal = signal();
-
+  const internalSet = resultSignal.set;
   const recompute = () => {
     cleanup(recompute);
     const prevSubscriber = currentSubscriber;
@@ -44,7 +46,7 @@ function computed(callback) {
 
     try {
       const value = callback();
-      resultSignal.set(value);
+      internalSet(value);
     } finally {
       currentSubscriber = prevSubscriber;
     }
@@ -52,6 +54,7 @@ function computed(callback) {
   recompute.sources = new Set();
 
   recompute();
+  resultSignal.set = null;
   return resultSignal;
 }
 
@@ -70,7 +73,7 @@ function effect(effectFn) {
   runEffect.sources = new Set();
 
   runEffect();
-  return runEffect;
+  return () => cleanup(runEffect);
 }
 
 export { effect, computed };

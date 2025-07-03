@@ -3,139 +3,129 @@ const GLOBAL_ENV = typeof window === "undefined" ? globalThis : window;
 export default class JSXEvaluator {
   constructor(context = {}) {
     this.context = context;
-    this.compiledElements = new WeakMap();
     this.expressionCache = new WeakMap();
   }
 
   evaluate(node) {
     if (!node || !node.type) {
-      return () => undefined;
+      return {
+        binding: () => undefined,
+        isReactive: false,
+        type: "static",
+      };
+    }
+
+    if (this.isJSXNode(node)) {
+      return {
+        binding: () => node,
+        isReactive: false,
+        type: "static",
+      };
     }
 
     if (this.expressionCache.has(node)) {
       return this.expressionCache.get(node);
     }
 
-    let result;
+    const isReactive = this.containsSignal(node);
 
+    const binding = this.createBinding(node);
+
+    const result = {
+      binding,
+      isReactive,
+      type: isReactive ? "reactive" : "static",
+    };
+
+    this.expressionCache.set(node, result);
+    return result;
+  }
+
+  createBinding(node) {
     switch (node.type) {
       case "StringLiteral":
-        result = () => node.value;
-        break;
+        return () => node.value;
       case "NumericLiteral":
-        result = () => node.value;
-        break;
+        return () => node.value;
       case "BooleanLiteral":
-        result = () => node.value;
-        break;
+        return () => node.value;
       case "NullLiteral":
-        result = () => null;
-        break;
+        return () => null;
       case "UndefinedLiteral":
-        result = () => undefined;
-        break;
+        return () => undefined;
 
       case "Identifier":
-        result = this.handleIdentifier(node);
-        break;
+        return this.handleIdentifier(node);
 
       case "MemberExpression":
       case "OptionalMemberExpression":
-        result = this.handleMemberExpression(node);
-        break;
+        return this.handleMemberExpression(node);
 
       case "CallExpression":
-        result = this.handleCallExpression(node);
-        break;
+        return this.handleCallExpression(node);
       case "OptionalCallExpression":
-        result = this.handleOptionalCallExpression(node);
-        break;
+        return this.handleOptionalCallExpression(node);
 
       case "ConditionalExpression":
-        result = this.handleConditionalExpression(node);
-        break;
+        return this.handleConditionalExpression(node);
       case "LogicalExpression":
-        result = this.handleLogicalExpression(node);
-        break;
-
-      case "JSXElement":
-        result = this.handleJSXElement(node);
-        break;
-      case "JSXEmptyExpression":
-        result = () => "";
-        break;
-      case "JSXFragment":
-        result = this.handleJSXFragment(node);
-        break;
-      case "JSXText":
-        result = () => node.value;
-        break;
-      case "JSXExpressionContainer":
-        result = this.evaluate(node.expression);
-        break;
+        return this.handleLogicalExpression(node);
 
       case "UnaryExpression":
-        result = this.handleUnaryExpression(node);
-        break;
+        return this.handleUnaryExpression(node);
       case "BinaryExpression":
-        result = this.handleBinaryExpression(node);
-        break;
+        return this.handleBinaryExpression(node);
       case "AssignmentExpression":
-        result = this.handleAssignmentExpression(node);
-        break;
+        return this.handleAssignmentExpression(node);
       case "UpdateExpression":
-        result = this.handleUpdateExpression(node);
-        break;
+        return this.handleUpdateExpression(node);
 
       case "ObjectExpression":
-        result = this.handleObjectExpression(node);
-        break;
+        return this.handleObjectExpression(node);
       case "ArrayExpression":
-        result = this.handleArrayExpression(node);
-        break;
+        return this.handleArrayExpression(node);
       case "SpreadElement":
-        result = this.handleSpreadElement(node);
-        break;
+        return this.handleSpreadElement(node);
 
       case "ArrowFunctionExpression":
       case "FunctionExpression":
       case "ArrowFunction":
-        result = this.handleArrowFunctionExpression(node);
-        break;
+        return this.handleArrowFunctionExpression(node);
       case "FunctionDeclaration":
-        result = this.handleFunctionDeclaration(node);
-        break;
+        return this.handleFunctionDeclaration(node);
 
       case "TemplateLiteral":
-        result = this.handleTemplateLiteral(node);
-        break;
+        return this.handleTemplateLiteral(node);
       case "TaggedTemplateExpression":
-        result = this.handleTaggedTemplateExpression(node);
-        break;
+        return this.handleTaggedTemplateExpression(node);
 
       case "ParenthesisExpression":
       case "ParenthesizedExpression":
-        result = this.evaluate(node.expression);
-        break;
+        return this.evaluate(node.expression).binding;
       case "SequenceExpression":
-        result = this.handleSequenceExpression(node);
-        break;
+        return this.handleSequenceExpression(node);
       case "ThisExpression":
-        result = () => this.context.this || this;
-        break;
+        return () => this.context.this || this;
       case "NewExpression":
-        result = this.handleNewExpression(node);
-        break;
+        return this.handleNewExpression(node);
 
       case "BlockStatement":
-        result = this.handleBlockStatement(node);
-        break;
+        return this.handleBlockStatement(node);
       case "ExpressionStatement":
-        result = () => this.evaluate(node.expression)();
-        break;
+        return () => this.evaluate(node.expression).binding();
       case "ReturnStatement":
-        result = node.argument ? this.evaluate(node.argument) : () => undefined;
-        break;
+        return node.argument
+          ? this.evaluate(node.argument).binding
+          : () => undefined;
+
+      case "JSXExpressionContainer":
+        return this.evaluate(node.expression).binding;
+
+      case "JSXEmptyExpression":
+        return () => "";
+
+      case "JSXText":
+        return () => node.value;
 
       default:
         if (
@@ -144,29 +134,185 @@ export default class JSXEvaluator {
             node.type.toLowerCase().includes("arrow") ||
             (node.params && node.body))
         ) {
-          result = this.handleArrowFunctionExpression(node);
+          return this.handleArrowFunctionExpression(node);
         } else {
-          result = () => undefined;
+          return () => undefined;
         }
     }
+  }
 
-    this.expressionCache.set(node, result);
-    return result;
+  containsSignal(node) {
+    if (!node || !node.type) return false;
+
+    switch (node.type) {
+      case "StringLiteral":
+      case "NumericLiteral":
+      case "BooleanLiteral":
+      case "NullLiteral":
+      case "UndefinedLiteral":
+      case "JSXEmptyExpression":
+      case "JSXText":
+        return false;
+
+      case "Identifier":
+        const value = this.context[node.value];
+        const result = this.isSignalValue(value);
+
+        return result;
+
+      case "MemberExpression":
+      case "OptionalMemberExpression":
+        const objectHasSignal = this.containsSignal(node.object);
+
+        if (objectHasSignal) {
+          return true;
+        }
+
+        if (node.computed) {
+          const propertyHasSignal = this.containsSignal(node.property);
+
+          if (propertyHasSignal) {
+            return true;
+          }
+        }
+
+        try {
+          const objectBinding = this.createBinding(node.object);
+          const obj = objectBinding();
+
+          if (obj != null) {
+            const key = node.computed
+              ? this.createBinding(node.property)()
+              : node.property.value;
+            const prop = obj[key];
+
+            if (this.isSignalValue(prop)) {
+              return true;
+            }
+          }
+
+          return false;
+        } catch (error) {}
+
+      case "CallExpression":
+      case "OptionalCallExpression":
+        const calleeContainsSignal = this.containsSignal(node.callee);
+
+        const argsContainSignal =
+          node.arguments &&
+          node.arguments.some((arg) => this.containsSignal(arg));
+
+        if (node.callee.type === "Identifier" && !calleeContainsSignal) {
+          return argsContainSignal;
+        }
+
+        const callResult = calleeContainsSignal || argsContainSignal;
+        return callResult;
+
+      case "ConditionalExpression":
+        return (
+          this.containsSignal(node.test) ||
+          this.containsSignal(node.consequent) ||
+          this.containsSignal(node.alternate)
+        );
+
+      case "LogicalExpression":
+      case "BinaryExpression":
+        return (
+          this.containsSignal(node.left) || this.containsSignal(node.right)
+        );
+
+      case "UnaryExpression":
+        return this.containsSignal(node.argument);
+
+      case "AssignmentExpression":
+        return this.containsSignal(node.right);
+
+      case "UpdateExpression":
+        return this.containsSignal(node.argument);
+
+      case "ObjectExpression":
+        return (
+          node.properties &&
+          node.properties.some(
+            (prop) =>
+              prop.type === "ObjectProperty" &&
+              (this.containsSignal(prop.key) || this.containsSignal(prop.value))
+          )
+        );
+
+      case "ArrayExpression":
+        return (
+          node.elements &&
+          node.elements.some(
+            (element) => element && this.containsSignal(element)
+          )
+        );
+
+      case "SpreadElement":
+        return this.containsSignal(node.argument);
+
+      case "TemplateLiteral":
+        return (
+          node.expressions &&
+          node.expressions.some((expr) => this.containsSignal(expr))
+        );
+
+      case "TaggedTemplateExpression":
+        return this.containsSignal(node.tag) || this.containsSignal(node.quasi);
+
+      case "SequenceExpression":
+        return (
+          node.expressions &&
+          node.expressions.some((expr) => this.containsSignal(expr))
+        );
+
+      case "NewExpression":
+        return (
+          this.containsSignal(node.callee) ||
+          (node.arguments &&
+            node.arguments.some((arg) => this.containsSignal(arg)))
+        );
+
+      case "ParenthesisExpression":
+      case "ParenthesizedExpression":
+        return this.containsSignal(node.expression);
+
+      case "JSXExpressionContainer":
+        return this.containsSignal(node.expression);
+
+      default:
+        return false;
+    }
+  }
+
+  isJSXNode(node) {
+    return node.type === "JSXElement" || node.type === "JSXFragment";
+  }
+
+  isSignalValue(value) {
+    return value && typeof value === "function" && value.isSignal === true;
   }
 
   handleIdentifier(node) {
     const variableName = node.value;
     return () => {
       try {
+        let value;
+
         if (this.context.hasOwnProperty(variableName)) {
-          return this.context[variableName];
+          value = this.context[variableName];
+        } else if (GLOBAL_ENV.hasOwnProperty(variableName)) {
+          value = GLOBAL_ENV[variableName];
+        } else {
+          return undefined;
         }
 
-        if (GLOBAL_ENV.hasOwnProperty(variableName)) {
-          return GLOBAL_ENV[variableName];
+        if (this.isSignalValue(value)) {
+          return value();
         }
 
-        return undefined;
+        return value;
       } catch (error) {
         return undefined;
       }
@@ -174,20 +320,23 @@ export default class JSXEvaluator {
   }
 
   handleMemberExpression(node) {
-    const objectFn = this.evaluate(node.object);
+    const objectResult = this.evaluate(node.object);
     const propertyKey = node.computed
       ? this.evaluate(node.property)
-      : () => node.property.value;
+      : { binding: () => node.property.value };
 
     return () => {
       try {
-        const obj = objectFn();
+        const obj = objectResult.binding();
 
         if (obj == null) return;
 
-        const key =
-          typeof propertyKey === "function" ? propertyKey() : propertyKey;
+        const key = propertyKey.binding();
         const prop = obj[key];
+
+        if (this.isSignalValue(prop)) {
+          return prop();
+        }
 
         if (typeof prop === "function") {
           return prop.bind(obj);
@@ -201,43 +350,43 @@ export default class JSXEvaluator {
   }
 
   handleCallExpression(node) {
-    const calleeFn = this.evaluate(node.callee);
+    const calleeResult = this.evaluate(node.callee);
 
-    const argFunctions = node.arguments
+    const argResults = node.arguments
       ? node.arguments.map((arg) => {
           if (arg.type === "SpreadElement") {
             return {
               isSpread: true,
-              fn: this.evaluate(arg.argument),
+              result: this.evaluate(arg.argument),
             };
           }
           if (arg.spread !== undefined) {
             const actualArg = arg.expression || arg;
             return {
               isSpread: arg.spread,
-              fn: this.evaluate(actualArg),
+              result: this.evaluate(actualArg),
             };
           }
 
           return {
             isSpread: false,
-            fn: this.evaluate(arg),
+            result: this.evaluate(arg),
           };
         })
       : [];
 
     return () => {
       try {
-        const callee = calleeFn();
+        const callee = calleeResult.binding();
 
         if (typeof callee !== "function") return;
 
         const args = [];
-        for (let i = 0; i < argFunctions.length; i++) {
-          const { isSpread, fn } = argFunctions[i];
+        for (let i = 0; i < argResults.length; i++) {
+          const { isSpread, result } = argResults[i];
 
           try {
-            const argValue = fn();
+            const argValue = result.binding();
 
             if (isSpread && Array.isArray(argValue)) {
               args.push(...argValue);
@@ -248,6 +397,11 @@ export default class JSXEvaluator {
         }
 
         const result = callee(...args);
+
+        if (this.isSignalValue(result)) {
+          return result();
+        }
+
         return result;
       } catch (error) {
         return;
@@ -256,25 +410,31 @@ export default class JSXEvaluator {
   }
 
   handleOptionalCallExpression(node) {
-    const calleeFn = this.evaluate(node.callee);
-    const argFunctions = node.arguments
+    const calleeResult = this.evaluate(node.callee);
+    const argResults = node.arguments
       ? node.arguments.map((arg) => this.evaluate(arg))
       : [];
 
     return () => {
       try {
-        const callee = calleeFn();
+        const callee = calleeResult.binding();
         if (typeof callee !== "function") return;
 
-        const args = argFunctions.map((fn) => {
+        const args = argResults.map((result) => {
           try {
-            return fn();
+            return result.binding();
           } catch (error) {
             return;
           }
         });
 
-        return callee(...args);
+        const result = callee(...args);
+
+        if (this.isSignalValue(result)) {
+          return result();
+        }
+
+        return result;
       } catch (error) {
         return;
       }
@@ -282,33 +442,37 @@ export default class JSXEvaluator {
   }
 
   handleConditionalExpression(node) {
-    const testFn = this.evaluate(node.test);
-    const consequentFn = this.evaluate(node.consequent);
-    const alternateFn = this.evaluate(node.alternate);
+    const testResult = this.evaluate(node.test);
+    const consequentResult = this.evaluate(node.consequent);
+    const alternateResult = this.evaluate(node.alternate);
 
     return () => {
       try {
-        return testFn() ? consequentFn() : alternateFn();
-      } catch (error) {
+        const testValue = testResult.binding();
+        const result = testValue
+          ? consequentResult.binding()
+          : alternateResult.binding();
+        return result;
+      } catch {
         return;
       }
     };
   }
 
   handleLogicalExpression(node) {
-    const leftFn = this.evaluate(node.left);
-    const rightFn = this.evaluate(node.right);
+    const leftResult = this.evaluate(node.left);
+    const rightResult = this.evaluate(node.right);
 
     return () => {
       try {
-        const leftValue = leftFn();
+        const leftValue = leftResult.binding();
         switch (node.operator) {
           case "&&":
-            return leftValue && rightFn();
+            return leftValue && rightResult.binding();
           case "||":
-            return leftValue || rightFn();
+            return leftValue || rightResult.binding();
           case "??":
-            return leftValue ?? rightFn();
+            return leftValue ?? rightResult.binding();
           default:
             return false;
         }
@@ -318,179 +482,8 @@ export default class JSXEvaluator {
     };
   }
 
-  handleJSXElement(node) {
-    if (this.compiledElements.has(node)) {
-      return this.compiledElements.get(node);
-    }
-
-    const template = this.compileJSXTemplate(node);
-
-    const elementFactory = () => {
-      const result = this.createElementFromTemplate(template);
-
-      const jsxObject = {
-        ...node,
-        _boundContext: this.context,
-        _compiled: result,
-      };
-
-      return jsxObject;
-    };
-
-    this.compiledElements.set(node, elementFactory);
-    return elementFactory;
-  }
-
-  handleJSXFragment(node) {
-    return () => {
-      const children = node.children
-        .map((child) => {
-          try {
-            if (child.type === "JSXElement") {
-              return this.evaluate(child)();
-            } else if (child.type === "JSXExpressionContainer") {
-              return this.evaluate(child.expression)();
-            } else if (child.type === "JSXText") {
-              return child.value.trim();
-            }
-            return null;
-          } catch (error) {
-            return null;
-          }
-        })
-        .filter(Boolean);
-
-      return {
-        type: "JSXFragment",
-        children: children,
-      };
-    };
-  }
-
-  compileJSXTemplate(node) {
-    return {
-      type: "jsx-template",
-      tagName: node.opening.name.value,
-      props: this.compileProps(node.opening.attributes),
-      children: this.compileChildren(node.children),
-      _original: node,
-    };
-  }
-
-  compileProps(attributes) {
-    const props = {
-      static: {},
-      dynamic: {},
-      events: {},
-    };
-
-    attributes.forEach((attr) => {
-      try {
-        const name = attr.name.value;
-
-        if (attr.value?.type === "JSXExpressionContainer") {
-          const binding = this.evaluate(attr.value.expression);
-
-          if (name.startsWith("on")) {
-            props.events[name.slice(2).toLowerCase()] = binding;
-          } else {
-            props.dynamic[name] = binding;
-          }
-        } else if (attr.value?.type === "StringLiteral") {
-          props.static[name] = attr.value.value;
-        } else if (!attr.value) {
-          props.static[name] = "";
-        }
-      } catch (error) {}
-    });
-
-    return props;
-  }
-
-  compileChildren(children) {
-    return children
-      .map((child) => {
-        try {
-          if (child.type === "JSXText") {
-            const value = child.value.trim();
-            return value
-              ? {
-                  type: "text",
-                  value: value,
-                }
-              : null;
-          } else if (child.type === "JSXExpressionContainer") {
-            return {
-              type: "expression",
-              binding: this.evaluate(child.expression),
-            };
-          } else if (child.type === "JSXElement") {
-            return this.compileJSXTemplate(child);
-          }
-          return null;
-        } catch (error) {
-          return null;
-        }
-      })
-      .filter(Boolean);
-  }
-
-  createElementFromTemplate(template) {
-    const element = document.createElement(template.tagName);
-
-    Object.entries(template.props.static).forEach(([name, value]) => {
-      element.setAttribute(name, value);
-    });
-
-    const dynamicBindings = Object.entries(template.props.dynamic).map(
-      ([name, binding]) => ({
-        type: "attribute",
-        element,
-        name,
-        binding,
-      })
-    );
-
-    Object.entries(template.props.events).forEach(([event, binding]) => {
-      try {
-        const handler = binding();
-        if (typeof handler === "function") {
-          element.addEventListener(event, handler);
-        }
-      } catch (error) {}
-    });
-
-    const childBindings = [];
-    template.children.forEach((child, index) => {
-      try {
-        if (child.type === "text") {
-          if (child.value) {
-            element.appendChild(document.createTextNode(child.value));
-          }
-        } else if (child.type === "expression") {
-          const anchor = document.createComment(`child-${index}`);
-          element.appendChild(anchor);
-          childBindings.push({
-            type: "content",
-            anchor,
-            binding: child.binding,
-          });
-        } else if (child.type === "jsx-template") {
-          const childResult = this.createElementFromTemplate(child);
-          element.appendChild(childResult.element);
-          childBindings.push(...childResult.bindings);
-        }
-      } catch (error) {}
-    });
-
-    return {
-      element,
-      bindings: [...dynamicBindings, ...childBindings],
-    };
-  }
-
   handleUnaryExpression(node) {
-    const argumentFn = this.evaluate(node.argument);
+    const argumentResult = this.evaluate(node.argument);
     const operators = {
       "!": (v) => !v,
       "-": (v) => -v,
@@ -502,7 +495,7 @@ export default class JSXEvaluator {
 
     return () => {
       try {
-        const value = argumentFn();
+        const value = argumentResult.binding();
         const operation = operators[node.operator];
         return operation ? operation(value) : value;
       } catch (error) {
@@ -512,14 +505,14 @@ export default class JSXEvaluator {
   }
 
   handleBinaryExpression(node) {
-    const leftFn = this.evaluate(node.left);
-    const rightFn = this.evaluate(node.right);
+    const leftResult = this.evaluate(node.left);
+    const rightResult = this.evaluate(node.right);
 
     if (node.operator === "&&") {
       return () => {
         try {
-          const leftValue = leftFn();
-          return leftValue && rightFn();
+          const leftValue = leftResult.binding();
+          return leftValue && rightResult.binding();
         } catch (error) {
           return false;
         }
@@ -529,8 +522,8 @@ export default class JSXEvaluator {
     if (node.operator === "||") {
       return () => {
         try {
-          const leftValue = leftFn();
-          return leftValue || rightFn();
+          const leftValue = leftResult.binding();
+          return leftValue || rightResult.binding();
         } catch (error) {
           return false;
         }
@@ -561,8 +554,8 @@ export default class JSXEvaluator {
 
     return () => {
       try {
-        const left = leftFn();
-        const right = rightFn();
+        const left = leftResult.binding();
+        const right = rightResult.binding();
         const operation = operators[node.operator];
         return operation ? operation(left, right) : undefined;
       } catch (error) {
@@ -572,10 +565,10 @@ export default class JSXEvaluator {
   }
 
   handleAssignmentExpression(node) {
-    const rightFn = this.evaluate(node.right);
+    const rightResult = this.evaluate(node.right);
     return () => {
       try {
-        return rightFn();
+        return rightResult.binding();
       } catch (error) {
         return;
       }
@@ -583,11 +576,11 @@ export default class JSXEvaluator {
   }
 
   handleUpdateExpression(node) {
-    const argumentFn = this.evaluate(node.argument);
+    const argumentResult = this.evaluate(node.argument);
 
     return () => {
       try {
-        const current = argumentFn();
+        const current = argumentResult.binding();
         switch (node.operator) {
           case "++":
             return node.prefix ? current + 1 : current;
@@ -603,23 +596,23 @@ export default class JSXEvaluator {
   }
 
   handleObjectExpression(node) {
-    const propertyFunctions = node.properties
+    const propertyResults = node.properties
       .filter((prop) => prop.type === "ObjectProperty")
       .map((prop) => ({
-        keyFn:
+        keyResult:
           prop.key.type === "Identifier" && !prop.computed
-            ? () => prop.key.value
+            ? { binding: () => prop.key.value }
             : this.evaluate(prop.key),
-        valueFn: this.evaluate(prop.value),
+        valueResult: this.evaluate(prop.value),
       }));
 
     return () => {
       try {
         const obj = {};
-        propertyFunctions.forEach(({ keyFn, valueFn }) => {
+        propertyResults.forEach(({ keyResult, valueResult }) => {
           try {
-            const key = keyFn();
-            const value = valueFn();
+            const key = keyResult.binding();
+            const value = valueResult.binding();
             obj[key] = value;
           } catch (error) {}
         });
@@ -631,18 +624,18 @@ export default class JSXEvaluator {
   }
 
   handleArrayExpression(node) {
-    const elementFunctions = node.elements.map((element) => {
+    const elementResults = node.elements.map((element) => {
       if (!element || !element.type) {
-        return () => undefined;
+        return { binding: () => undefined };
       }
       return this.evaluate(element);
     });
 
     return () => {
       try {
-        return elementFunctions.map((fn) => {
+        return elementResults.map((result) => {
           try {
-            return fn();
+            return result.binding();
           } catch (error) {
             return;
           }
@@ -654,11 +647,11 @@ export default class JSXEvaluator {
   }
 
   handleSpreadElement(node) {
-    const argumentFn = this.evaluate(node.argument);
+    const argumentResult = this.evaluate(node.argument);
 
     return () => {
       try {
-        const value = argumentFn();
+        const value = argumentResult.binding();
 
         if (Array.isArray(value)) {
           return value;
@@ -700,32 +693,35 @@ export default class JSXEvaluator {
           const evaluator = new JSXEvaluator(newContext);
           let result;
 
-          if (node.body.type === "JSXElement") {
-            const jsxFactory = evaluator.evaluate(node.body);
-            result = jsxFactory();
+          if (this.isJSXNode(node.body)) {
+            return { ...node.body, _boundContext: newContext };
           } else if (node.body.type === "ParenthesisExpression") {
             const innerExpression = node.body.expression;
-            if (innerExpression.type === "JSXElement") {
-              const jsxFactory = evaluator.evaluate(innerExpression);
-              result = jsxFactory();
+            if (this.isJSXNode(innerExpression)) {
+              return { ...innerExpression, _boundContext: newContext };
             } else {
-              const exprFn = evaluator.evaluate(innerExpression);
-              result = typeof exprFn === "function" ? exprFn() : exprFn;
+              const exprResult = evaluator.evaluate(innerExpression);
+              result = exprResult.binding();
             }
           } else if (node.body.type === "BlockStatement") {
-            const bodyFn = evaluator.evaluate(node.body);
-            result = bodyFn();
+            const bodyResult = evaluator.evaluate(node.body);
+            result = bodyResult.binding();
           } else {
-            const bodyFn = evaluator.evaluate(node.body);
-            if (typeof bodyFn === "function") {
-              result = bodyFn();
-            } else {
-              result = bodyFn;
-            }
+            const bodyResult = evaluator.evaluate(node.body);
+            result = bodyResult.binding();
+          }
+
+          if (result && typeof result === "object" && this.isJSXNode(result)) {
+            return { ...result, _boundContext: newContext };
+          }
+
+          if (this.isSignalValue(result)) {
+            return result();
           }
 
           return result;
         } catch (error) {
+          console.error("ArrowFunction execution error:", error);
           return;
         }
       };
@@ -751,8 +747,14 @@ export default class JSXEvaluator {
           });
 
           const evaluator = new JSXEvaluator(newContext);
-          const bodyFn = evaluator.evaluate(node.body);
-          return bodyFn();
+          const bodyResult = evaluator.evaluate(node.body);
+          const result = bodyResult.binding();
+
+          if (this.isSignalValue(result)) {
+            return result();
+          }
+
+          return result;
         } catch (error) {
           return undefined;
         }
@@ -772,7 +774,7 @@ export default class JSXEvaluator {
         quasi.cooked || quasi.value?.cooked || quasi.value?.raw || "";
       return () => value;
     });
-    const expressionFunctions = node.expressions.map((expr) =>
+    const expressionResults = node.expressions.map((expr) =>
       this.evaluate(expr)
     );
 
@@ -781,8 +783,8 @@ export default class JSXEvaluator {
         let result = "";
         for (let i = 0; i < quasisFunctions.length; i++) {
           result += quasisFunctions[i]();
-          if (i < expressionFunctions.length) {
-            const exprValue = expressionFunctions[i]();
+          if (i < expressionResults.length) {
+            const exprValue = expressionResults[i].binding();
             result += exprValue != null ? String(exprValue) : "";
           }
         }
@@ -794,16 +796,22 @@ export default class JSXEvaluator {
   }
 
   handleTaggedTemplateExpression(node) {
-    const tagFn = this.evaluate(node.tag);
-    const templateFn = this.evaluate(node.quasi);
+    const tagResult = this.evaluate(node.tag);
+    const templateResult = this.evaluate(node.quasi);
 
     return () => {
       try {
-        const tag = tagFn();
-        const template = templateFn();
+        const tag = tagResult.binding();
+        const template = templateResult.binding();
 
         if (typeof tag === "function") {
-          return tag(template);
+          const result = tag(template);
+
+          if (this.isSignalValue(result)) {
+            return result();
+          }
+
+          return result;
         }
         return template;
       } catch (error) {
@@ -813,16 +821,21 @@ export default class JSXEvaluator {
   }
 
   handleSequenceExpression(node) {
-    const expressionFunctions = node.expressions.map((expr) =>
+    const expressionResults = node.expressions.map((expr) =>
       this.evaluate(expr)
     );
 
     return () => {
       try {
         let result;
-        expressionFunctions.forEach((fn) => {
-          result = fn();
+        expressionResults.forEach((evalResult) => {
+          result = evalResult.binding();
         });
+
+        if (this.isSignalValue(result)) {
+          return result();
+        }
+
         return result;
       } catch (error) {
         return;
@@ -831,24 +844,30 @@ export default class JSXEvaluator {
   }
 
   handleNewExpression(node) {
-    const calleeFn = this.evaluate(node.callee);
-    const argFunctions = node.arguments
+    const calleeResult = this.evaluate(node.callee);
+    const argResults = node.arguments
       ? node.arguments.map((arg) => this.evaluate(arg))
       : [];
 
     return () => {
       try {
-        const Constructor = calleeFn();
-        const args = argFunctions.map((fn) => {
+        const Constructor = calleeResult.binding();
+        const args = argResults.map((result) => {
           try {
-            return fn();
+            return result.binding();
           } catch (error) {
             return;
           }
         });
 
         if (typeof Constructor === "function") {
-          return new Constructor(...args);
+          const result = new Constructor(...args);
+
+          if (this.isSignalValue(result)) {
+            return result();
+          }
+
+          return result;
         }
         throw new Error("Constructor is not a function");
       } catch (error) {
@@ -858,14 +877,19 @@ export default class JSXEvaluator {
   }
 
   handleBlockStatement(node) {
-    const statementFns = node.body.map((stmt) => this.evaluate(stmt));
+    const statementResults = node.body.map((stmt) => this.evaluate(stmt));
 
     return () => {
       try {
         let result;
-        statementFns.forEach((fn) => {
-          result = fn();
+        statementResults.forEach((evalResult) => {
+          result = evalResult.binding();
         });
+
+        if (this.isSignalValue(result)) {
+          return result();
+        }
+
         return result;
       } catch (error) {
         return;
